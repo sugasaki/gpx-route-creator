@@ -84,8 +84,12 @@ export function useMapHandlers({ mapRef }: UseMapHandlersProps) {
   }, [editMode])
   
   const handleMouseLeave = useCallback((e: any) => {
-    e.target.getCanvas().style.cursor = ''
-  }, [])
+    if (editMode === 'create') {
+      e.target.getCanvas().style.cursor = 'crosshair'
+    } else {
+      e.target.getCanvas().style.cursor = ''
+    }
+  }, [editMode])
   
   return {
     handleMapClick,

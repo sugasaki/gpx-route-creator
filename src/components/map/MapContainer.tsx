@@ -21,18 +21,20 @@ const MapContainer = forwardRef<MapRef, MapContainerProps>(
     const shouldShowInteractiveLine = editMode === 'create' && route.points.length > 1
     
     return (
-      <Map
-        ref={ref}
-        mapStyle={MAP_CONSTANTS.STYLE_URL}
-        initialViewState={MAP_CONSTANTS.INITIAL_VIEW_STATE}
-        onClick={onClick}
-        onMouseMove={onMouseMove}
-        interactiveLayerIds={shouldShowInteractiveLine ? ['route-line'] : []}
-        onMouseEnter={onMouseEnter}
-        onMouseLeave={onMouseLeave}
-      >
-        {children}
-      </Map>
+      <div className={editMode === 'create' ? 'map-cursor-crosshair' : ''}>
+        <Map
+          ref={ref}
+          mapStyle={MAP_CONSTANTS.STYLE_URL}
+          initialViewState={MAP_CONSTANTS.INITIAL_VIEW_STATE}
+          onClick={onClick}
+          onMouseMove={onMouseMove}
+          interactiveLayerIds={shouldShowInteractiveLine ? ['route-line'] : []}
+          onMouseEnter={onMouseEnter}
+          onMouseLeave={onMouseLeave}
+        >
+          {children}
+        </Map>
+      </div>
     )
   }
 )

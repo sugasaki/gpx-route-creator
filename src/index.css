@@ -11,3 +11,12 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+/* Map cursor styles */
+.map-cursor-crosshair {
+  cursor: crosshair !important;
+}
+
+.map-cursor-crosshair canvas {
+  cursor: crosshair !important;
+}

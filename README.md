@@ -38,6 +38,13 @@ MapLibreとReactを使用したWebベースのGPXルート作成アプリケー�
 - **ビルドツール**: Vite
 - **アイコン**: Heroicons
 
+### 特徴
+
+- 🧩 **コンポーネント指向**: 各コンポーネントは100行以下でシンプルに保たれています
+- 🪝 **カスタムフック**: 複雑なロジックは再利用可能なフックに分離
+- 📁 **整理されたファイル構造**: 機能ごとに適切に分類されたディレクトリ
+- 🎯 **単一責任の原則**: 各モジュールが明確な役割を持つ設計
+
 ## セットアップ
 
 ### 必要な環境
@@ -99,9 +106,18 @@ pnpm preview
 ```
 src/
 ├── components/
-│   ├── Map.tsx          # メイン地図コンポーネント
+│   ├── Map.tsx          # メイン地図コンポーネント（88行）
 │   ├── MapControls.tsx  # UIコントロール
-│   └── RouteMarker.tsx  # ポイントマーカー
+│   └── RouteMarker.tsx  # ポイントマーカー（48行）
+├── hooks/
+│   ├── useMapHandlers.ts  # 地図操作のカスタムフック
+│   └── useMarkerDrag.ts   # マーカードラッグのカスタムフック
+├── utils/
+│   ├── geo.ts           # 地理計算ユーティリティ
+│   ├── gpx.ts           # GPXファイル生成
+│   └── mapHelpers.ts    # 地図関連ヘルパー
+├── constants/
+│   └── map.ts           # 地図関連の定数
 ├── store/
 │   ├── routeStore.ts    # ルートデータ管理
 │   └── uiStore.ts       # UI状態管理
@@ -109,6 +125,15 @@ src/
 │   └── index.ts         # 型定義
 └── App.tsx              # ルートコンポーネント
 ```
+
+### アーキテクチャ
+
+このプロジェクトは、保守性と拡張性を重視した設計になっています：
+
+- **コンポーネント**: UIの表示に専念（ロジックは最小限）
+- **カスタムフック**: 複雑なロジックをカプセル化
+- **ユーティリティ**: 純粋関数で再利用可能な処理
+- **状態管理**: Zustandで集中管理
 
 ### 主要な型定義
 
@@ -141,6 +166,41 @@ MIT License
 4. GitHub Actionsが自動的にビルド・デプロイ
 5. https://sugasaki.github.io/gpx-route-creator/ で公開
 
+## 拡張ガイド
+
+### 新機能の追加方法
+
+#### 1. 新しい地図操作を追加する場合
+```typescript
+// src/hooks/useYourFeature.ts
+export function useYourFeature() {
+  // ロジックをここに実装
+}
+```
+
+#### 2. 新しいコントロールを追加する場合
+```typescript
+// src/components/YourControl.tsx
+export default function YourControl() {
+  // UIコンポーネントのみ、ロジックはhooksへ
+}
+```
+
+#### 3. 新しい計算処理を追加する場合
+```typescript
+// src/utils/yourUtil.ts
+export function calculateSomething() {
+  // 純粋関数として実装
+}
+```
+
+### コーディング規約
+
+- **コンポーネント**: 100行以下を目標
+- **カスタムフック**: 単一責任の原則に従う
+- **ユーティリティ**: 副作用のない純粋関数
+- **型定義**: 明示的な型付けを推奨
+
 ## 貢献
 
 プルリクエストを歓迎します。大きな変更の場合は、まずissueを作成して変更内容について議論してください。
@@ -151,6 +211,16 @@ MIT License
 3. 変更をコミット (`git commit -m 'Add some amazing feature'`)
 4. ブランチにプッシュ (`git push origin feature/amazing-feature`)
 5. プルリクエストを作成
+
+### コミットメッセージ
+- 日本語で記載
+- 変更内容を簡潔に説明
+- 絵文字プレフィックス推奨:
+  - ✨ 新機能
+  - 🐛 バグ修正
+  - 📝 ドキュメント
+  - ♻️ リファクタリング
+  - 🎨 UI/UX改善
 
 ## 作成者
 

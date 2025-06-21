@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { RoutePoint, Route } from '../types'
+import { calculateDistance } from '../utils/geo'
 
 interface RouteState {
   route: Route
@@ -19,27 +20,6 @@ interface RouteState {
 }
 
 const generateId = () => Math.random().toString(36).substr(2, 9)
-
-const calculateDistance = (points: RoutePoint[]): number => {
-  let distance = 0
-  for (let i = 1; i < points.length; i++) {
-    const prev = points[i - 1]
-    const curr = points[i]
-    
-    const R = 6371000 // Earth radius in meters
-    const dLat = (curr.lat - prev.lat) * Math.PI / 180
-    const dLon = (curr.lng - prev.lng) * Math.PI / 180
-    const a = 
-      Math.sin(dLat/2) * Math.sin(dLat/2) +
-      Math.cos(prev.lat * Math.PI / 180) * Math.cos(curr.lat * Math.PI / 180) *
-      Math.sin(dLon/2) * Math.sin(dLon/2)
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))
-    const d = R * c
-    
-    distance += d
-  }
-  return distance
-}
 
 export const useRouteStore = create<RouteState>((set, get) => ({
   route: { points: [], distance: 0 },

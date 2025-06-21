@@ -1,5 +1,6 @@
 import { useRouteStore } from '../store/routeStore'
 import { useUIStore } from '../store/uiStore'
+import { downloadGPX } from '../utils/gpx'
 import { 
   ArrowUturnLeftIcon, 
   ArrowUturnRightIcon,
@@ -20,27 +21,7 @@ export default function MapControls() {
   const hasRoute = route.points.length > 0
   
   const handleExportGPX = () => {
-    if (route.points.length === 0) return
-    
-    const gpx = `<?xml version="1.0" encoding="UTF-8"?>
-<gpx version="1.1" creator="GPX Route Creator">
-  <trk>
-    <name>Route</name>
-    <trkseg>
-${route.points.map(p => `      <trkpt lat="${p.lat}" lon="${p.lng}">
-        ${p.elevation ? `<ele>${p.elevation}</ele>` : ''}
-      </trkpt>`).join('\n')}
-    </trkseg>
-  </trk>
-</gpx>`
-    
-    const blob = new Blob([gpx], { type: 'application/gpx+xml' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = 'route.gpx'
-    a.click()
-    URL.revokeObjectURL(url)
+    downloadGPX(route.points)
   }
   
   return (

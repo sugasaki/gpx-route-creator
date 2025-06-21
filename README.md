@@ -105,25 +105,27 @@ pnpm preview
 
 ```
 src/
-├── components/
-│   ├── Map.tsx          # メイン地図コンポーネント（88行）
+├── App.tsx              # ルートコンポーネント
+├── main.tsx             # エントリーポイント
+├── index.css            # グローバルスタイル
+├── components/          # UIコンポーネント
+│   ├── Map.tsx          # メイン地図コンポーネント
 │   ├── MapControls.tsx  # UIコントロール
-│   └── RouteMarker.tsx  # ポイントマーカー（48行）
-├── hooks/
+│   └── RouteMarker.tsx  # ポイントマーカー
+├── hooks/               # カスタムフック
 │   ├── useMapHandlers.ts  # 地図操作のカスタムフック
 │   └── useMarkerDrag.ts   # マーカードラッグのカスタムフック
-├── utils/
+├── utils/               # ユーティリティ関数
 │   ├── geo.ts           # 地理計算ユーティリティ
 │   ├── gpx.ts           # GPXファイル生成
 │   └── mapHelpers.ts    # 地図関連ヘルパー
-├── constants/
+├── constants/           # 定数定義
 │   └── map.ts           # 地図関連の定数
-├── store/
+├── store/               # 状態管理
 │   ├── routeStore.ts    # ルートデータ管理
 │   └── uiStore.ts       # UI状態管理
-├── types/
-│   └── index.ts         # 型定義
-└── App.tsx              # ルートコンポーネント
+└── types/               # 型定義
+    └── index.ts         # 型定義
 ```
 
 ### アーキテクチャ

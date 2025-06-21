@@ -1,0 +1,37 @@
+import { Source, Layer } from 'react-map-gl/maplibre'
+import { useRouteStore } from '../../store/routeStore'
+import { getLineGeoJSON } from '../../utils/mapHelpers'
+import { MAP_CONSTANTS } from '../../constants/map'
+
+export default function RouteLine() {
+  const { route } = useRouteStore()
+  
+  if (route.points.length <= 1) return null
+  
+  return (
+    <Source
+      id="route-source"
+      type="geojson"
+      data={getLineGeoJSON(route.points)}
+    >
+      <Layer
+        id="route-line-hover"
+        type="line"
+        paint={{
+          'line-color': MAP_CONSTANTS.COLORS.LINE,
+          'line-width': MAP_CONSTANTS.LINE_HOVER_WIDTH,
+          'line-opacity': MAP_CONSTANTS.LINE_HOVER_OPACITY
+        }}
+      />
+      <Layer
+        id="route-line"
+        type="line"
+        paint={{
+          'line-color': MAP_CONSTANTS.COLORS.LINE,
+          'line-width': MAP_CONSTANTS.LINE_WIDTH,
+          'line-opacity': MAP_CONSTANTS.LINE_OPACITY
+        }}
+      />
+    </Source>
+  )
+}

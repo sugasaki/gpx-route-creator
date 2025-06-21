@@ -1,4 +1,4 @@
-import { useCallback, RefObject } from 'react'
+import { useCallback, RefObject, useEffect } from 'react'
 import { MapRef } from 'react-map-gl/maplibre'
 import { useRouteStore } from '../store/routeStore'
 import { useUIStore } from '../store/uiStore'
@@ -12,6 +12,18 @@ interface UseMapHandlersProps {
 export function useMapHandlers({ mapRef }: UseMapHandlersProps) {
   const { route, addPoint, insertPoint } = useRouteStore()
   const { editMode, hoveredPointId, setHoveredPoint } = useUIStore()
+  
+  // Set cursor based on edit mode
+  useEffect(() => {
+    if (!mapRef.current) return
+    
+    const canvas = mapRef.current.getCanvas()
+    if (editMode === 'create') {
+      canvas.style.cursor = 'crosshair'
+    } else {
+      canvas.style.cursor = ''
+    }
+  }, [editMode, mapRef])
   
   const handleMapClick = useCallback((e: any) => {
     if (editMode !== 'create') return

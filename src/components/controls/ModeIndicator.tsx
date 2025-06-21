@@ -27,7 +27,7 @@ export default function ModeIndicator() {
           <>
             <div className="flex items-center gap-2">
               <PencilIcon className="w-5 h-5 text-green-400" />
-              <span className="text-sm">Click points to delete</span>
+              <span className="text-sm">Select & click or press Delete to remove</span>
             </div>
             <div className="flex items-center gap-2">
               <ArrowsPointingOutIcon className="w-5 h-5 text-gray-400" />

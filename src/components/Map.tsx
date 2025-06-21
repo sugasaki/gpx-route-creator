@@ -1,6 +1,7 @@
 import { useRef } from 'react'
 import { MapRef } from 'react-map-gl/maplibre'
 import { useMapHandlers } from '../hooks/useMapHandlers'
+import { useKeyboardShortcuts } from '../hooks/useKeyboardShortcuts'
 import MapControls from './MapControls'
 import MapContainer from './map/MapContainer'
 import RouteLine from './map/RouteLine'
@@ -15,6 +16,8 @@ export default function MapComponent() {
     handleMouseEnter,
     handleMouseLeave
   } = useMapHandlers({ mapRef })
+  
+  useKeyboardShortcuts()
   
   return (
     <div className="relative h-full w-full">

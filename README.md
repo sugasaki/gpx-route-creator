@@ -83,7 +83,7 @@ pnpm dev
 Streets、Satellite、Outdoorスタイルを使用するには、MapTiler APIキーが必要です：
 1. [MapTiler Cloud](https://cloud.maptiler.com/)でアカウントを作成
 2. ダッシュボードからAPIキーを取得
-3. `.env`ファイルにキーを設定: `VITE_MAPTILER_API_KEY=your_key_here`
+3. `.env`ファイルにキーを設定: `VITE_MAPTILER_KEY=your_key_here`
 
 ### ビルド
 

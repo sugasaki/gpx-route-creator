@@ -9,7 +9,7 @@ export interface MapStyle {
 }
 
 // Get MapTiler API key from environment
-const MAPTILER_API_KEY = import.meta.env.VITE_MAPTILER_API_KEY
+const MAPTILER_API_KEY = import.meta.env.VITE_MAPTILER_KEY
 
 // Map styles configuration
 export const MAP_STYLES: Record<MapStyleId, MapStyle> = {
@@ -22,7 +22,7 @@ export const MAP_STYLES: Record<MapStyleId, MapStyle> = {
   streets: {
     id: 'streets',
     name: 'Streets',
-    url: MAPTILER_API_KEY 
+    url: MAPTILER_API_KEY
       ? `https://api.maptiler.com/maps/streets-v2/style.json?key=${MAPTILER_API_KEY}`
       : '',
     needsApiKey: true
@@ -30,7 +30,7 @@ export const MAP_STYLES: Record<MapStyleId, MapStyle> = {
   satellite: {
     id: 'satellite',
     name: 'Satellite',
-    url: MAPTILER_API_KEY 
+    url: MAPTILER_API_KEY
       ? `https://api.maptiler.com/maps/satellite/style.json?key=${MAPTILER_API_KEY}`
       : '',
     needsApiKey: true
@@ -38,7 +38,7 @@ export const MAP_STYLES: Record<MapStyleId, MapStyle> = {
   outdoor: {
     id: 'outdoor',
     name: 'Outdoor',
-    url: MAPTILER_API_KEY 
+    url: MAPTILER_API_KEY
       ? `https://api.maptiler.com/maps/outdoor-v2/style.json?key=${MAPTILER_API_KEY}`
       : '',
     needsApiKey: true
@@ -48,17 +48,17 @@ export const MAP_STYLES: Record<MapStyleId, MapStyle> = {
 export const MAP_CONSTANTS = {
   // Default map style
   DEFAULT_STYLE: 'dark' as MapStyleId,
-  
+
   // Initial view state
   INITIAL_VIEW_STATE: {
     longitude: 139.7528, // Tokyo Imperial Palace
     latitude: 35.6854,
     zoom: 14
   },
-  
+
   // Interaction thresholds
   HOVER_THRESHOLD_PIXELS: 20 as const,
-  
+
   // Colors
   COLORS: {
     LINE: '#3b82f6',
@@ -68,7 +68,7 @@ export const MAP_CONSTANTS = {
     MARKER_SELECTED: '#10b981',
     MARKER_DRAGGING: '#ef4444'
   },
-  
+
   // Line styles
   LINE_WIDTH: 4,
   LINE_OPACITY: 0.8,

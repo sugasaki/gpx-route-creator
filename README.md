@@ -32,7 +32,8 @@ MapLibreとReactを使用したWebベースのGPXルート作成アプリケー�
 - Undo/Redo機能
 - 総距離の自動計算
 - GPXファイルのエクスポート
-- ダークテーマの地図スタイル
+- 地図スタイルの切り替え（Streets/Dark/Satellite/Outdoor）
+- 選択した地図スタイルの自動保存
 
 ## 技術スタック
 
@@ -68,11 +69,21 @@ cd gpx-route-creator
 # 依存関係のインストール
 pnpm install
 
+# 環境変数の設定（地図スタイル切り替えを使用する場合）
+cp .env.example .env
+# .envファイルを編集してMapTiler APIキーを設定
+
 # 開発サーバーの起動
 pnpm dev
 ```
 
 開発サーバーは http://localhost:3000 で起動します。
+
+#### MapTiler APIキーの取得
+Streets、Satellite、Outdoorスタイルを使用するには、MapTiler APIキーが必要です：
+1. [MapTiler Cloud](https://cloud.maptiler.com/)でアカウントを作成
+2. ダッシュボードからAPIキーを取得
+3. `.env`ファイルにキーを設定: `VITE_MAPTILER_KEY=your_key_here`
 
 ### ビルド
 
@@ -261,8 +272,8 @@ export function calculateSomething() {
 - 🏔️ 標高グラフ表示
 - 💾 ローカルストレージへの自動保存
 - 📤 GPXファイルのインポート
-- 🗺️ 複数の地図スタイル切り替え
 - 📱 モバイル対応の改善
+- 🛣️ ルート自動提案（道路に沿った経路）
 
 ## トラブルシューティング
 

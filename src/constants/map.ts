@@ -1,6 +1,53 @@
+// Map style types
+export type MapStyleId = 'dark' | 'streets' | 'satellite' | 'outdoor'
+
+export interface MapStyle {
+  id: MapStyleId
+  name: string
+  url: string
+  needsApiKey: boolean
+}
+
+// Get MapTiler API key from environment
+const MAPTILER_API_KEY = import.meta.env.VITE_MAPTILER_API_KEY
+
+// Map styles configuration
+export const MAP_STYLES: Record<MapStyleId, MapStyle> = {
+  dark: {
+    id: 'dark',
+    name: 'Dark',
+    url: 'https://basemaps.cartocdn.com/gl/dark-matter-nolabels-gl-style/style.json',
+    needsApiKey: false
+  },
+  streets: {
+    id: 'streets',
+    name: 'Streets',
+    url: MAPTILER_API_KEY 
+      ? `https://api.maptiler.com/maps/streets-v2/style.json?key=${MAPTILER_API_KEY}`
+      : '',
+    needsApiKey: true
+  },
+  satellite: {
+    id: 'satellite',
+    name: 'Satellite',
+    url: MAPTILER_API_KEY 
+      ? `https://api.maptiler.com/maps/satellite/style.json?key=${MAPTILER_API_KEY}`
+      : '',
+    needsApiKey: true
+  },
+  outdoor: {
+    id: 'outdoor',
+    name: 'Outdoor',
+    url: MAPTILER_API_KEY 
+      ? `https://api.maptiler.com/maps/outdoor-v2/style.json?key=${MAPTILER_API_KEY}`
+      : '',
+    needsApiKey: true
+  }
+}
+
 export const MAP_CONSTANTS = {
-  // Map style
-  STYLE_URL: 'https://basemaps.cartocdn.com/gl/dark-matter-nolabels-gl-style/style.json',
+  // Default map style
+  DEFAULT_STYLE: 'dark' as MapStyleId,
   
   // Initial view state
   INITIAL_VIEW_STATE: {

@@ -3,7 +3,7 @@ import Map, { MapRef } from 'react-map-gl/maplibre'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import { useRouteStore } from '../../store/routeStore'
 import { useUIStore } from '../../store/uiStore'
-import { MAP_CONSTANTS } from '../../constants/map'
+import { MAP_CONSTANTS, MAP_STYLES } from '../../constants/map'
 
 interface MapContainerProps {
   onClick: (e: any) => void
@@ -16,14 +16,18 @@ interface MapContainerProps {
 const MapContainer = forwardRef<MapRef, MapContainerProps>(
   ({ onClick, onMouseMove, onMouseEnter, onMouseLeave, children }, ref) => {
     const { route } = useRouteStore()
-    const { editMode } = useUIStore()
+    const { editMode, mapStyle } = useUIStore()
     
     const shouldShowInteractiveLine = editMode === 'create' && route.points.length > 1
+    const selectedStyle = MAP_STYLES[mapStyle]
+    
+    // Fallback to dark style if selected style has no URL (missing API key)
+    const mapStyleUrl = selectedStyle.url || MAP_STYLES.dark.url
     
     return (
       <Map
         ref={ref}
-        mapStyle={MAP_CONSTANTS.STYLE_URL}
+        mapStyle={mapStyleUrl}
         initialViewState={MAP_CONSTANTS.INITIAL_VIEW_STATE}
         onClick={onClick}
         onMouseMove={onMouseMove}

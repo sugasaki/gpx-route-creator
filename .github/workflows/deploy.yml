@@ -40,6 +40,7 @@ jobs:
         run: pnpm build
         env:
           NODE_ENV: production
+          VITE_MAPTILER_KEY: ${{ secrets.VITE_MAPTILER_KEY }}
           
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

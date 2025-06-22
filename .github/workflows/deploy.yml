@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - main
+  
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -12,11 +14,14 @@ permissions:
 
 concurrency:
   group: "pages"
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   # Build job
   build:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout

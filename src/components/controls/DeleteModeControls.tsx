@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { useRouteStore } from '../../store/routeStore'
 import { useUIStore } from '../../store/uiStore'
-import { TrashIcon } from '@heroicons/react/24/outline'
+import { XCircleIcon } from '@heroicons/react/24/outline'
 
 export default function DeleteModeControls() {
   const { route } = useRouteStore()
@@ -34,7 +34,7 @@ export default function DeleteModeControls() {
       `}
       title="Delete points"
     >
-      <TrashIcon className="w-5 h-5" />
+      <XCircleIcon className="w-5 h-5" />
     </button>
   )
 }

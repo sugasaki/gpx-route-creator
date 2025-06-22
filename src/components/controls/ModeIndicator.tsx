@@ -1,5 +1,5 @@
 import { useUIStore } from '../../store/uiStore'
-import { ArrowsPointingOutIcon, MapPinIcon, PencilIcon, TrashIcon, ViewfinderCircleIcon } from '@heroicons/react/24/outline'
+import { ArrowsPointingOutIcon, MapPinIcon, PencilIcon, XCircleIcon, ViewfinderCircleIcon } from '@heroicons/react/24/outline'
 
 export default function ModeIndicator() {
   const { editMode } = useUIStore()
@@ -43,7 +43,7 @@ export default function ModeIndicator() {
         ) : editMode === 'delete' ? (
           <>
             <div className="flex items-center gap-2">
-              <TrashIcon className="w-5 h-5 text-red-400" />
+              <XCircleIcon className="w-5 h-5 text-red-400" />
               <span className="text-sm">Click points to delete</span>
             </div>
             <div className="flex items-center gap-2 text-gray-400">

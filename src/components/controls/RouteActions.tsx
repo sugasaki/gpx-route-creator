@@ -1,19 +1,41 @@
+import { useState } from 'react'
 import { useRouteStore } from '../../store/routeStore'
 import { downloadGPX } from '../../utils/gpx'
-import { TrashIcon, ArrowDownTrayIcon } from '@heroicons/react/24/outline'
+import { XMarkIcon, ArrowDownTrayIcon } from '@heroicons/react/24/outline'
+import ConfirmationDialog from '../ConfirmationDialog'
 
 export default function RouteActions() {
   const { route, clearRoute } = useRouteStore()
   const hasRoute = route.points.length > 0
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false)
   
   const handleExportGPX = () => {
     downloadGPX(route.points)
   }
   
+  const handleClearRoute = () => {
+    setShowConfirmDialog(true)
+  }
+  
+  const confirmClearRoute = () => {
+    clearRoute()
+    setShowConfirmDialog(false)
+  }
+  
   return (
     <>
+      <ConfirmationDialog
+        isOpen={showConfirmDialog}
+        onClose={() => setShowConfirmDialog(false)}
+        onConfirm={confirmClearRoute}
+        title="ルートをクリアしますか？"
+        message="この操作は取り消すことができません。現在のルートがすべて削除されます。"
+        confirmText="クリア"
+        cancelText="キャンセル"
+        variant="danger"
+      />
       <button
-        onClick={clearRoute}
+        onClick={handleClearRoute}
         disabled={!hasRoute}
         className={`
           p-3 bg-white rounded-lg shadow-lg transition-all
@@ -22,9 +44,9 @@ export default function RouteActions() {
             : 'text-gray-300 cursor-not-allowed'
           }
         `}
-        title="Clear route"
+        title="ルートをクリア"
       >
-        <TrashIcon className="w-5 h-5" />
+        <XMarkIcon className="w-5 h-5" />
       </button>
       
       <button
@@ -37,7 +59,7 @@ export default function RouteActions() {
             : 'text-gray-300 cursor-not-allowed'
           }
         `}
-        title="Export GPX"
+        title="GPXファイルをエクスポート"
       >
         <ArrowDownTrayIcon className="w-5 h-5" />
       </button>

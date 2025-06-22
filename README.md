@@ -27,13 +27,20 @@ MapLibreとReactを使用したWebベースのGPXルート作成アプリケー�
 - 削除モード時は全ポイントを表示
 - リアルタイムでラインが追従
 - モードごとに最適化されたカーソル表示
+- ルートクリア時に確認ダイアログ表示（誤操作防止）
+
+### 🎨 カスタマイズ機能
+- 地図スタイルの切り替え（Streets/Dark/Satellite/Outdoor）
+- ルートラインの色を自由に変更
+  - 8色のプリセットカラー
+  - カスタムカラーピッカーで任意の色を選択
+- 選択した設定はすべて自動保存
 
 ### 💾 その他の機能
 - Undo/Redo機能
 - 総距離の自動計算
 - GPXファイルのエクスポート
-- 地図スタイルの切り替え（Streets/Dark/Satellite/Outdoor）
-- 選択した地図スタイルの自動保存
+- すべての設定をlocalStorageに永続化
 
 ## 技術スタック
 
@@ -121,6 +128,16 @@ pnpm preview
    - ドラッグで範囲選択: 範囲内のポイントを一括削除
    - ESCキー: 表示モードに戻る
 
+### その他のコントロール
+- **地図スタイル切替** (右上のドロップダウン)
+  - Streets（デフォルト）、Dark、Satellite、Outdoorから選択
+- **ルート色変更** (右上のカラーピッカー)
+  - プリセットカラーまたはカスタム色を選択
+- **ルートクリア** (×ボタン)
+  - 確認ダイアログ表示後、全ポイントを削除
+- **GPXエクスポート** (ダウンロードボタン)
+  - 作成したルートをGPXファイルとして保存
+
 ### ポイントの色分け
 - 🔵 **青**: 始点
 - 🟠 **オレンジ**: 終点
@@ -146,20 +163,26 @@ src/
 │   │   ├── EditControls.tsx     # 作成・編集モードボタン
 │   │   ├── DeleteModeControls.tsx # 削除モードボタン
 │   │   ├── RangeDeleteControls.tsx # 矩形削除モードボタン
+│   │   ├── MapStyleSelector.tsx # 地図スタイルセレクター
+│   │   ├── RouteColorPicker.tsx # ルート色選択
+│   │   ├── ConfirmationDialog.tsx # 確認ダイアログ
 │   │   └── ...          # その他のコントロール
-│   └── map/             # 地図関連コンポーネント
+│   ├── map/             # 地図関連コンポーネント
+│   └── ui/              # 汎用UIコンポーネント
 ├── hooks/               # カスタムフック
 │   ├── useMapHandlers.ts  # 地図操作のカスタムフック
-│   └── useMarkerDrag.ts   # マーカードラッグのカスタムフック
+│   ├── useMarkerDrag.ts   # マーカードラッグのカスタムフック
+│   └── useColorPicker.ts  # カラーピッカーのカスタムフック
 ├── utils/               # ユーティリティ関数
 │   ├── geo.ts           # 地理計算ユーティリティ
 │   ├── gpx.ts           # GPXファイル生成
 │   └── mapHelpers.ts    # 地図関連ヘルパー
 ├── constants/           # 定数定義
-│   └── map.ts           # 地図関連の定数
+│   └── map.ts           # 地図関連の定数（スタイル定義含む）
 ├── store/               # 状態管理
 │   ├── routeStore.ts    # ルートデータ管理
-│   └── uiStore.ts       # UI状態管理
+│   ├── uiStore.ts       # UI状態管理（地図スタイル含む）
+│   └── colorStore.ts    # ルート色管理
 └── types/               # 型定義
     └── index.ts         # 型定義
 ```
@@ -265,6 +288,19 @@ export function calculateSomething() {
   - 🎨 UI/UX改善
 
 詳細なコミットガイドラインは [doc/commit-guideline.md](doc/commit-guideline.md) を参照してください。
+
+## 最近の更新
+
+### v1.3.0 (2024年12月)
+- ✨ 地図スタイル切り替え機能（Streets/Dark/Satellite/Outdoor）
+- ✨ ルートライン色のカスタマイズ機能
+- 🎨 ルート削除時の確認ダイアログ追加
+- 🔧 GitHub Actionsデプロイ環境の改善
+
+### v1.2.0 (2024年12月)
+- ✨ ポイント削除機能（個別削除・矩形範囲削除）
+- ✨ 全モードでESCキーサポート
+- 🎨 UIアイコンの改善
 
 ## 今後の機能追加予定
 

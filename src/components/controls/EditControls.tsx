@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { useRouteStore } from '../../store/routeStore'
 import { useUIStore } from '../../store/uiStore'
 import { PlusIcon, PencilIcon } from '@heroicons/react/24/outline'
@@ -7,10 +8,28 @@ export default function EditControls() {
   const { editMode, setEditMode } = useUIStore()
   const hasRoute = route.points.length > 0
   
+  // ESCキーで作成モード・編集モードを解除
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((editMode === 'create' || editMode === 'edit') && e.key === 'Escape') {
+        setEditMode('view')
+      }
+    }
+    
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [editMode, setEditMode])
+  
   return (
     <>
       <button
-        onClick={() => setEditMode(editMode === 'create' ? 'view' : 'create')}
+        onClick={() => {
+          if (editMode === 'create') {
+            setEditMode('view')
+          } else {
+            setEditMode('create')
+          }
+        }}
         className={`
           p-3 rounded-lg shadow-lg transition-all
           ${editMode === 'create' 
@@ -24,7 +43,13 @@ export default function EditControls() {
       </button>
       
       <button
-        onClick={() => setEditMode(editMode === 'edit' ? 'view' : 'edit')}
+        onClick={() => {
+          if (editMode === 'edit') {
+            setEditMode('view')
+          } else {
+            setEditMode('edit')
+          }
+        }}
         disabled={!hasRoute}
         className={`
           p-3 rounded-lg shadow-lg transition-all

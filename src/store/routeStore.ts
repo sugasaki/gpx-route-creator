@@ -10,6 +10,7 @@ interface RouteState {
   insertPoint: (index: number, point: Omit<RoutePoint, 'id'>) => void
   updatePoint: (id: string, point: Partial<RoutePoint>) => void
   deletePoint: (id: string) => void
+  deleteMultiplePoints: (ids: string[]) => void
   movePoint: (id: string, lat: number, lng: number) => void
   movePointWithoutHistory: (id: string, lat: number, lng: number) => void
   saveCurrentStateToHistory: () => void
@@ -75,6 +76,20 @@ export const useRouteStore = create<RouteState>((set, get) => ({
   
   deletePoint: (id) => {
     const newPoints = get().route.points.filter(p => p.id !== id)
+    const newRoute = { points: newPoints, distance: calculateDistance(newPoints) }
+    
+    const newHistory = get().history.slice(0, get().historyIndex + 1)
+    newHistory.push(newRoute)
+    
+    set({
+      route: newRoute,
+      history: newHistory,
+      historyIndex: newHistory.length - 1
+    })
+  },
+  
+  deleteMultiplePoints: (ids) => {
+    const newPoints = get().route.points.filter(p => !ids.includes(p.id))
     const newRoute = { points: newPoints, distance: calculateDistance(newPoints) }
     
     const newHistory = get().history.slice(0, get().historyIndex + 1)

@@ -4,7 +4,7 @@ import RouteMarker from '../RouteMarker'
 
 export default function RouteMarkers() {
   const { route } = useRouteStore()
-  const { hoveredPointId } = useUIStore()
+  const { hoveredPointId, editMode } = useUIStore()
   
   return (
     <>
@@ -12,8 +12,9 @@ export default function RouteMarkers() {
         const isEndpoint = index === 0 || index === route.points.length - 1
         const isHovered = hoveredPointId === point.id
         
-        // Endpoints are always visible, middle points only when hovered
-        const isVisible = isEndpoint || isHovered || route.points.length <= 2
+        // 削除モードまたは矩形削除モードの場合は全てのポイントを表示
+        // それ以外の場合は、エンドポイントは常に表示、中間点はホバー時のみ
+        const isVisible = editMode === 'delete' || editMode === 'delete-range' || isEndpoint || isHovered || route.points.length <= 2
         
         return (
           <RouteMarker

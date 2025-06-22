@@ -6,14 +6,16 @@ import HistoryControls from './controls/HistoryControls'
 import RouteActions from './controls/RouteActions'
 import ModeIndicator from './controls/ModeIndicator'
 import MapStyleSelector from './controls/MapStyleSelector'
+import RouteColorPicker from './controls/RouteColorPicker'
 
 export default function MapControls() {
   return (
     <>
       <RouteInfoBar />
       
-      {/* Map style selector - top right */}
-      <div className="absolute right-4 top-4">
+      {/* Map style selector and color picker - top right */}
+      <div className="absolute right-4 top-4 flex gap-2">
+        <RouteColorPicker />
         <MapStyleSelector />
       </div>
       

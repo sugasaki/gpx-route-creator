@@ -32,7 +32,7 @@ MapLibreとReactを使用したWebベースのGPXルート作成アプリケー�
 - Undo/Redo機能
 - 総距離の自動計算
 - GPXファイルのエクスポート
-- 地図スタイルの切り替え（Dark/Streets/Satellite/Outdoor）
+- 地図スタイルの切り替え（Streets/Dark/Satellite/Outdoor）
 - 選択した地図スタイルの自動保存
 
 ## 技術スタック

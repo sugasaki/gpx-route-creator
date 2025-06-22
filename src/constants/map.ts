@@ -47,7 +47,7 @@ export const MAP_STYLES: Record<MapStyleId, MapStyle> = {
 
 export const MAP_CONSTANTS = {
   // Default map style
-  DEFAULT_STYLE: 'dark' as MapStyleId,
+  DEFAULT_STYLE: 'streets' as MapStyleId,
 
   // Initial view state
   INITIAL_VIEW_STATE: {

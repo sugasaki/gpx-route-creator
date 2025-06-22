@@ -151,40 +151,15 @@ pnpm preview
 
 ```
 src/
-├── App.tsx              # ルートコンポーネント
-├── main.tsx             # エントリーポイント
-├── index.css            # グローバルスタイル
 ├── components/          # UIコンポーネント
-│   ├── Map.tsx          # メイン地図コンポーネント
-│   ├── MapControls.tsx  # UIコントロール
-│   ├── RouteMarker.tsx  # ポイントマーカー
-│   ├── SelectionOverlay.tsx # 矩形選択オーバーレイ
 │   ├── controls/        # コントロールコンポーネント
-│   │   ├── EditControls.tsx     # 作成・編集モードボタン
-│   │   ├── DeleteModeControls.tsx # 削除モードボタン
-│   │   ├── RangeDeleteControls.tsx # 矩形削除モードボタン
-│   │   ├── MapStyleSelector.tsx # 地図スタイルセレクター
-│   │   ├── RouteColorPicker.tsx # ルート色選択
-│   │   ├── ConfirmationDialog.tsx # 確認ダイアログ
-│   │   └── ...          # その他のコントロール
 │   ├── map/             # 地図関連コンポーネント
 │   └── ui/              # 汎用UIコンポーネント
 ├── hooks/               # カスタムフック
-│   ├── useMapHandlers.ts  # 地図操作のカスタムフック
-│   ├── useMarkerDrag.ts   # マーカードラッグのカスタムフック
-│   └── useColorPicker.ts  # カラーピッカーのカスタムフック
 ├── utils/               # ユーティリティ関数
-│   ├── geo.ts           # 地理計算ユーティリティ
-│   ├── gpx.ts           # GPXファイル生成
-│   └── mapHelpers.ts    # 地図関連ヘルパー
 ├── constants/           # 定数定義
-│   └── map.ts           # 地図関連の定数（スタイル定義含む）
-├── store/               # 状態管理
-│   ├── routeStore.ts    # ルートデータ管理
-│   ├── uiStore.ts       # UI状態管理（地図スタイル含む）
-│   └── colorStore.ts    # ルート色管理
+├── store/               # 状態管理（Zustand）
 └── types/               # 型定義
-    └── index.ts         # 型定義
 ```
 
 ### アーキテクチャ
@@ -288,19 +263,6 @@ export function calculateSomething() {
   - 🎨 UI/UX改善
 
 詳細なコミットガイドラインは [doc/commit-guideline.md](doc/commit-guideline.md) を参照してください。
-
-## 最近の更新
-
-### v1.3.0 (2024年12月)
-- ✨ 地図スタイル切り替え機能（Streets/Dark/Satellite/Outdoor）
-- ✨ ルートライン色のカスタマイズ機能
-- 🎨 ルート削除時の確認ダイアログ追加
-- 🔧 GitHub Actionsデプロイ環境の改善
-
-### v1.2.0 (2024年12月)
-- ✨ ポイント削除機能（個別削除・矩形範囲削除）
-- ✨ 全モードでESCキーサポート
-- 🎨 UIアイコンの改善
 
 ## 今後の機能追加予定
 

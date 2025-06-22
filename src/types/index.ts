@@ -10,4 +10,4 @@ export interface Route {
   distance: number
 }
 
-export type EditMode = 'view' | 'create' | 'edit'
+export type EditMode = 'view' | 'create' | 'edit' | 'delete' | 'delete-range'

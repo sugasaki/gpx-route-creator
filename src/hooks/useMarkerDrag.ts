@@ -15,8 +15,9 @@ export function useMarkerDrag({ point, isFirst, isLast }: UseMarkerDragProps) {
   const [isDragging, setIsDragging] = useState(false)
   
   const isSelected = selectedPointId === point.id
-  const canDrag = true // Always allow dragging
+  const canDrag = editMode !== 'delete' && editMode !== 'delete-range' // ドラッグは削除モード以外で可能
   const canDelete = editMode === 'edit' && !isFirst && !isLast
+  const canDeleteInDeleteMode = editMode === 'delete' // 削除モードでは全てのポイントが削除可能
   
   const handleDragStart = useCallback(() => {
     setIsDragging(true)
@@ -36,13 +37,19 @@ export function useMarkerDrag({ point, isFirst, isLast }: UseMarkerDragProps) {
   const handleClick = useCallback((e: any) => {
     e.originalEvent.stopPropagation()
     
-    // Always allow selection
-    if (isSelected && canDelete) {
+    // 削除モードの場合は即座に削除
+    if (canDeleteInDeleteMode) {
       deletePoint(point.id)
-    } else {
+    } 
+    // 編集モードで選択済みの場合は削除（始点・終点以外）
+    else if (isSelected && canDelete) {
+      deletePoint(point.id)
+    } 
+    // それ以外は選択
+    else {
       setSelectedPoint(point.id)
     }
-  }, [isSelected, canDelete, point.id, deletePoint, setSelectedPoint])
+  }, [isSelected, canDelete, canDeleteInDeleteMode, point.id, deletePoint, setSelectedPoint])
   
   const handleMouseEnter = useCallback(() => {
     setHoveredPoint(point.id)

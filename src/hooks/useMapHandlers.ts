@@ -20,6 +20,10 @@ export function useMapHandlers({ mapRef }: UseMapHandlersProps) {
     const canvas = mapRef.current.getCanvas()
     if (editMode === 'create') {
       canvas.style.cursor = 'crosshair'
+    } else if (editMode === 'delete') {
+      canvas.style.cursor = 'pointer'
+    } else if (editMode === 'delete-range') {
+      canvas.style.cursor = 'crosshair'
     } else {
       canvas.style.cursor = ''
     }
@@ -97,6 +101,10 @@ export function useMapHandlers({ mapRef }: UseMapHandlersProps) {
   
   const handleMouseLeave = useCallback((e: any) => {
     if (editMode === 'create') {
+      e.target.getCanvas().style.cursor = 'crosshair'
+    } else if (editMode === 'delete') {
+      e.target.getCanvas().style.cursor = 'pointer'
+    } else if (editMode === 'delete-range') {
       e.target.getCanvas().style.cursor = 'crosshair'
     } else {
       e.target.getCanvas().style.cursor = ''

@@ -57,7 +57,6 @@ function WaypointMarker({ waypoint }: { waypoint: Waypoint }) {
   
   const {
     isDragging,
-    isSelected,
     canDrag,
     handlers
   } = useWaypointDrag({ waypoint })

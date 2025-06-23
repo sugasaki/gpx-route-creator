@@ -81,15 +81,6 @@ export function useMapHandlers({ mapRef }: UseMapHandlersProps) {
             lng: closestPoint.lng
           })
           setWaypointDialogOpen(true)
-        } else {
-          // ルートから離れた場所をクリックした場合は、開いているポップアップを閉じる
-          // MapLibre GLのポップアップを閉じるために、マップ全体にクリックイベントを伝播
-          const event = new MouseEvent('click', {
-            bubbles: true,
-            cancelable: true,
-            view: window
-          })
-          mapRef.current?.getCanvas().dispatchEvent(event)
         }
       }
       return

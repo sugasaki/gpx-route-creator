@@ -86,7 +86,7 @@ function WaypointMarker({ waypoint }: { waypoint: Waypoint }) {
           offset={[0, -42]}
           onClose={() => setShowPopup(false)}
           closeButton={true}
-          closeOnClick={false}
+          closeOnClick={true}
           className="waypoint-popup"
         >
           <div className="p-2 min-w-[150px]">

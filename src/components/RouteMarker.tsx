@@ -1,7 +1,7 @@
 import { Marker } from 'react-map-gl/maplibre'
-import { RoutePoint } from '../types'
-import { useMarkerDrag } from '../hooks/useMarkerDrag'
-import { getMarkerColor } from '../utils/mapHelpers'
+import { RoutePoint } from '@/types'
+import { useMarkerDrag } from '@/hooks/useMarkerDrag'
+import { getMarkerColor } from '@/utils/mapHelpers'
 
 interface RouteMarkerProps {
   point: RoutePoint

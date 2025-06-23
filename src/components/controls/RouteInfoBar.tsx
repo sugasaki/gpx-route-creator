@@ -1,4 +1,4 @@
-import { useRouteStore } from '../../store/routeStore'
+import { useRouteStore } from '@/store/routeStore'
 
 export default function RouteInfoBar() {
   const { route } = useRouteStore()

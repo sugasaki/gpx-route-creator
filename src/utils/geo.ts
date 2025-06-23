@@ -1,4 +1,4 @@
-import { RoutePoint } from '../types'
+import { RoutePoint } from '@/types'
 
 /**
  * Calculate distance from point to line segment

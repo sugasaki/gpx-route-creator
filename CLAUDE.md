@@ -78,3 +78,6 @@
 # テストの書き方
 
 `doc/test-guideline.md`を参照してください
+
+## Work Progress
+- issue #10に着手

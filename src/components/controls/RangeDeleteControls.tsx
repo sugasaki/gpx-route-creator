@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
-import { useRouteStore } from '../../store/routeStore'
-import { useUIStore } from '../../store/uiStore'
+import { useRouteStore } from '@/store/routeStore'
+import { useUIStore } from '@/store/uiStore'
 import { ViewfinderCircleIcon } from '@heroicons/react/24/outline'
 
 export default function RangeDeleteControls() {

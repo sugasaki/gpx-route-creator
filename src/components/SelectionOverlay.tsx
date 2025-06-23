@@ -1,7 +1,7 @@
 import { useRef, useCallback, useState, useEffect } from 'react'
 import { MapRef } from 'react-map-gl/maplibre'
-import { useRouteStore } from '../store/routeStore'
-import { useUIStore } from '../store/uiStore'
+import { useRouteStore } from '@/store/routeStore'
+import { useUIStore } from '@/store/uiStore'
 
 interface SelectionOverlayProps {
   mapRef: React.RefObject<MapRef | null>

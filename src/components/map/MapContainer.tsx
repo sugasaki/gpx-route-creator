@@ -1,9 +1,9 @@
 import { forwardRef } from 'react'
 import Map, { MapRef } from 'react-map-gl/maplibre'
 import 'maplibre-gl/dist/maplibre-gl.css'
-import { useRouteStore } from '../../store/routeStore'
-import { useUIStore } from '../../store/uiStore'
-import { MAP_CONSTANTS, MAP_STYLES } from '../../constants/map'
+import { useRouteStore } from '@/store/routeStore'
+import { useUIStore } from '@/store/uiStore'
+import { MAP_CONSTANTS, MAP_STYLES } from '@/constants/map'
 
 interface MapContainerProps {
   onClick: (e: any) => void

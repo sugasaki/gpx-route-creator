@@ -1,6 +1,6 @@
 import { create } from 'zustand'
-import { RoutePoint, Route } from '../types'
-import { calculateDistance } from '../utils/geo'
+import { RoutePoint, Route } from '@/types'
+import { calculateDistance } from '@/utils/geo'
 
 interface RouteState {
   route: Route

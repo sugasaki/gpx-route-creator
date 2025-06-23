@@ -1,9 +1,9 @@
 import { useCallback, RefObject, useEffect } from 'react'
 import { MapRef } from 'react-map-gl/maplibre'
-import { useRouteStore } from '../store/routeStore'
-import { useUIStore } from '../store/uiStore'
-import { findClosestSegmentIndex } from '../utils/geo'
-import { MAP_CONSTANTS } from '../constants/map'
+import { useRouteStore } from '@/store/routeStore'
+import { useUIStore } from '@/store/uiStore'
+import { findClosestSegmentIndex } from '@/utils/geo'
+import { MAP_CONSTANTS } from '@/constants/map'
 
 interface UseMapHandlersProps {
   mapRef: RefObject<MapRef | null>

@@ -1,8 +1,8 @@
 import { Source, Layer } from 'react-map-gl/maplibre'
-import { MAP_CONSTANTS } from '../../constants/map'
-import { useRouteStore } from '../../store/routeStore'
-import { useColorStore } from '../../store/colorStore'
-import { getLineGeoJSON } from '../../utils/mapHelpers'
+import { MAP_CONSTANTS } from '@/constants/map'
+import { useRouteStore } from '@/store/routeStore'
+import { useColorStore } from '@/store/colorStore'
+import { getLineGeoJSON } from '@/utils/mapHelpers'
 
 export default function RouteLine() {
   const { route } = useRouteStore()

@@ -1,8 +1,8 @@
 import { useState } from 'react'
-import { useRouteStore } from '../../store/routeStore'
-import { downloadGPX } from '../../utils/gpx'
+import { useRouteStore } from '@/store/routeStore'
+import { downloadGPX } from '@/utils/gpx'
 import { XMarkIcon, ArrowDownTrayIcon } from '@heroicons/react/24/outline'
-import ConfirmationDialog from '../ConfirmationDialog'
+import ConfirmationDialog from '@/components/ConfirmationDialog'
 
 export default function RouteActions() {
   const { route, clearRoute } = useRouteStore()

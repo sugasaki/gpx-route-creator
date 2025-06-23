@@ -1,11 +1,11 @@
 import { useRef } from 'react'
 import { MapRef } from 'react-map-gl/maplibre'
-import { useMapHandlers } from '../hooks/useMapHandlers'
-import MapControls from './MapControls'
-import MapContainer from './map/MapContainer'
-import RouteLine from './map/RouteLine'
-import RouteMarkers from './map/RouteMarkers'
-import SelectionOverlay from './SelectionOverlay'
+import { useMapHandlers } from '@/hooks/useMapHandlers'
+import MapControls from '@/components/MapControls'
+import MapContainer from '@/components/map/MapContainer'
+import RouteLine from '@/components/map/RouteLine'
+import RouteMarkers from '@/components/map/RouteMarkers'
+import SelectionOverlay from '@/components/SelectionOverlay'
 
 export default function MapComponent() {
   const mapRef = useRef<MapRef>(null)

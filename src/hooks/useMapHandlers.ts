@@ -122,6 +122,8 @@ export function useMapHandlers({ mapRef }: UseMapHandlersProps) {
   const handleMouseEnter = useCallback((e: any) => {
     if (editMode === 'create' && e.features && e.features.length > 0 && e.features[0].layer.id === 'route-line') {
       e.target.getCanvas().style.cursor = 'pointer'
+    } else if (editMode === 'waypoint' && e.features && e.features.length > 0 && e.features[0].layer.id === 'route-line') {
+      e.target.getCanvas().style.cursor = 'pointer'
     }
   }, [editMode])
   

@@ -3,6 +3,7 @@ import { Marker, Popup } from 'react-map-gl/maplibre'
 import { useRouteStore } from '@/store/routeStore'
 import { useUIStore } from '@/store/uiStore'
 import { Waypoint, WaypointType } from '@/types'
+import { useWaypointDrag } from '@/hooks/useWaypointDrag'
 
 // Waypointタイプごとのアイコン設定
 const getWaypointIcon = (type: WaypointType, isSelected: boolean): React.ReactNode => {
@@ -49,60 +50,67 @@ const getWaypointIcon = (type: WaypointType, isSelected: boolean): React.ReactNo
   )
 }
 
-export default function WaypointMarkers() {
-  const waypoints = useRouteStore((state) => state.waypoints)
+// 個別のWaypointマーカーコンポーネント
+function WaypointMarker({ waypoint }: { waypoint: Waypoint }) {
   const selectedWaypointId = useUIStore((state) => state.selectedWaypointId)
-  const setSelectedWaypoint = useUIStore((state) => state.setSelectedWaypoint)
-  const editMode = useUIStore((state) => state.editMode)
-  const setWaypointDialogOpen = useUIStore((state) => state.setWaypointDialogOpen)
-  const [popupWaypoint, setPopupWaypoint] = useState<Waypoint | null>(null)
+  const [showPopup, setShowPopup] = useState(false)
   
-  const handleWaypointClick = (waypointId: string) => {
-    if (editMode === 'waypoint') {
-      setSelectedWaypoint(waypointId)
-      setWaypointDialogOpen(true)
-    }
-  }
+  const {
+    isDragging,
+    isSelected,
+    canDrag,
+    handlers
+  } = useWaypointDrag({ waypoint })
   
   return (
     <>
-      {waypoints.map((waypoint) => (
-        <Marker
-          key={waypoint.id}
+      <Marker
+        longitude={waypoint.lng}
+        latitude={waypoint.lat}
+        anchor="bottom"
+        draggable={canDrag}
+        {...handlers}
+        onClick={(e) => {
+          handlers.onClick(e)
+          setShowPopup(true)
+        }}
+      >
+        {getWaypointIcon(waypoint.type, waypoint.id === selectedWaypointId || isDragging)}
+      </Marker>
+      
+      {showPopup && (
+        <Popup
           longitude={waypoint.lng}
           latitude={waypoint.lat}
           anchor="bottom"
-          onClick={(e) => {
-            e.originalEvent.stopPropagation()
-            handleWaypointClick(waypoint.id)
-            setPopupWaypoint(waypoint)
-          }}
-        >
-          {getWaypointIcon(waypoint.type, waypoint.id === selectedWaypointId)}
-        </Marker>
-      ))}
-      
-      {popupWaypoint && (
-        <Popup
-          longitude={popupWaypoint.lng}
-          latitude={popupWaypoint.lat}
-          anchor="bottom"
-          offset={[0, -35]}
-          onClose={() => setPopupWaypoint(null)}
+          offset={[0, -42]}
+          onClose={() => setShowPopup(false)}
           closeButton={true}
           closeOnClick={false}
         >
           <div className="p-2 min-w-[150px]">
-            <h3 className="font-bold">{popupWaypoint.name}</h3>
-            {popupWaypoint.description && (
-              <p className="text-sm text-gray-600 mt-1">{popupWaypoint.description}</p>
+            <h3 className="font-bold">{waypoint.name}</h3>
+            {waypoint.description && (
+              <p className="text-sm text-gray-600 mt-1">{waypoint.description}</p>
             )}
-            {popupWaypoint.elevation && (
-              <p className="text-xs text-gray-500 mt-1">標高: {popupWaypoint.elevation.toFixed(1)}m</p>
+            {waypoint.elevation && (
+              <p className="text-xs text-gray-500 mt-1">標高: {waypoint.elevation.toFixed(1)}m</p>
             )}
           </div>
         </Popup>
       )}
+    </>
+  )
+}
+
+export default function WaypointMarkers() {
+  const waypoints = useRouteStore((state) => state.waypoints)
+  
+  return (
+    <>
+      {waypoints.map((waypoint) => (
+        <WaypointMarker key={waypoint.id} waypoint={waypoint} />
+      ))}
       
       <style>{`
         .waypoint-icon {
@@ -132,6 +140,11 @@ export default function WaypointMarkers() {
         .waypoint-marker svg {
           width: 29px;
           height: 29px;
+        }
+        
+        /* ドラッグ中のカーソル */
+        .maplibregl-dragging .waypoint-marker {
+          cursor: grabbing !important;
         }
       `}</style>
     </>

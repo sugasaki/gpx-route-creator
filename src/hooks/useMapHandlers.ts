@@ -53,20 +53,21 @@ export function useMapHandlers({ mapRef }: UseMapHandlersProps) {
       }
       
       // ライン付近にWaypointを追加
-      if (route.points.length > 0) {
-        // クリック位置の周囲も含めて検索（半径20ピクセル）
-        const searchRadius = 20
+      if (route.points.length >= 2) {
+        // ルートの線幅の1.5倍の範囲内かチェック
+        const lineWidth = MAP_CONSTANTS.LINE_WIDTH
+        const clickRadius = lineWidth * 1.5 // 線幅の1.5倍
         const bbox: [[number, number], [number, number]] = [
-          [e.point.x - searchRadius, e.point.y - searchRadius],
-          [e.point.x + searchRadius, e.point.y + searchRadius]
+          [e.point.x - clickRadius, e.point.y - clickRadius],
+          [e.point.x + clickRadius, e.point.y + clickRadius]
         ]
         
         const features = mapRef.current?.queryRenderedFeatures(bbox, {
           layers: ['route-line']
         })
         
-        // ライン付近をクリックした場合、またはルートが存在する場合
-        if ((features && features.length > 0) || route.points.length >= 2) {
+        // ライン付近をクリックした場合のみWaypointを追加
+        if (features && features.length > 0) {
           // ライン上の最も近い点を計算
           const closestPoint = findClosestPointOnRoute(
             e.lngLat.lat,
@@ -80,6 +81,15 @@ export function useMapHandlers({ mapRef }: UseMapHandlersProps) {
             lng: closestPoint.lng
           })
           setWaypointDialogOpen(true)
+        } else {
+          // ルートから離れた場所をクリックした場合は、開いているポップアップを閉じる
+          // MapLibre GLのポップアップを閉じるために、マップ全体にクリックイベントを伝播
+          const event = new MouseEvent('click', {
+            bubbles: true,
+            cancelable: true,
+            view: window
+          })
+          mapRef.current?.getCanvas().dispatchEvent(event)
         }
       }
       return
@@ -143,8 +153,9 @@ export function useMapHandlers({ mapRef }: UseMapHandlersProps) {
       if (isOverWaypoint) {
         canvas.style.cursor = 'pointer'
       } else if (route.points.length >= 2) {
-        // ライン付近でカーソルを変更
-        const searchRadius = 20
+        // ライン付近でカーソルを変更（線幅の1.5倍の範囲）
+        const lineWidth = MAP_CONSTANTS.LINE_WIDTH
+        const searchRadius = lineWidth * 1.5
         const bbox: [[number, number], [number, number]] = [
           [e.point.x - searchRadius, e.point.y - searchRadius],
           [e.point.x + searchRadius, e.point.y + searchRadius]

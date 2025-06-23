@@ -1,6 +1,6 @@
-import { useRouteStore } from '../../store/routeStore'
-import { useUIStore } from '../../store/uiStore'
-import RouteMarker from '../RouteMarker'
+import { useRouteStore } from '@/store/routeStore'
+import { useUIStore } from '@/store/uiStore'
+import RouteMarker from '@/components/RouteMarker'
 
 export default function RouteMarkers() {
   const { route } = useRouteStore()

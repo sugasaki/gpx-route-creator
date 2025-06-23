@@ -1,4 +1,4 @@
-import { useRouteStore } from '../../store/routeStore'
+import { useRouteStore } from '@/store/routeStore'
 import { ArrowUturnLeftIcon, ArrowUturnRightIcon } from '@heroicons/react/24/outline'
 
 export default function HistoryControls() {

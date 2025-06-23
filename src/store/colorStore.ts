@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import { MAP_CONSTANTS } from '../constants/map'
+import { MAP_CONSTANTS } from '@/constants/map'
 
 interface ColorState {
   routeLineColor: string

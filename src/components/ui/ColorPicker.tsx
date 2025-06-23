@@ -1,4 +1,4 @@
-import { useColorPicker } from '../../hooks/useColorPicker'
+import { useColorPicker } from '@/hooks/useColorPicker'
 
 interface ColorPickerProps {
   value: string

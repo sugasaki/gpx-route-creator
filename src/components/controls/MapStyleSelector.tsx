@@ -1,8 +1,8 @@
 import { Fragment } from 'react'
 import { Listbox, Transition } from '@headlessui/react'
 import { MapIcon, ChevronUpDownIcon } from '@heroicons/react/24/outline'
-import { useUIStore } from '../../store/uiStore'
-import { MAP_STYLES } from '../../constants/map'
+import { useUIStore } from '@/store/uiStore'
+import { MAP_STYLES } from '@/constants/map'
 
 export default function MapStyleSelector() {
   const { mapStyle, setMapStyle } = useUIStore()

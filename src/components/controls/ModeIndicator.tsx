@@ -1,4 +1,4 @@
-import { useUIStore } from '../../store/uiStore'
+import { useUIStore } from '@/store/uiStore'
 import { ArrowsPointingOutIcon, MapPinIcon, PencilIcon, XCircleIcon, ViewfinderCircleIcon } from '@heroicons/react/24/outline'
 
 export default function ModeIndicator() {

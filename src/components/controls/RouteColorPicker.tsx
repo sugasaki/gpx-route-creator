@@ -1,5 +1,5 @@
-import ColorPicker from '../ui/ColorPicker'
-import { useColorStore } from '../../store/colorStore'
+import ColorPicker from '@/components/ui/ColorPicker'
+import { useColorStore } from '@/store/colorStore'
 
 export default function RouteColorPicker() {
   const { routeLineColor, setRouteLineColor } = useColorStore()

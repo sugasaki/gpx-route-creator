@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import { EditMode } from '../types'
-import { MapStyleId, MAP_CONSTANTS } from '../constants/map'
+import { EditMode } from '@/types'
+import { MapStyleId, MAP_CONSTANTS } from '@/constants/map'
 
 interface UIState {
   editMode: EditMode

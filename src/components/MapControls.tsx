@@ -1,12 +1,12 @@
-import RouteInfoBar from './controls/RouteInfoBar'
-import EditControls from './controls/EditControls'
-import DeleteModeControls from './controls/DeleteModeControls'
-import RangeDeleteControls from './controls/RangeDeleteControls'
-import HistoryControls from './controls/HistoryControls'
-import RouteActions from './controls/RouteActions'
-import ModeIndicator from './controls/ModeIndicator'
-import MapStyleSelector from './controls/MapStyleSelector'
-import RouteColorPicker from './controls/RouteColorPicker'
+import RouteInfoBar from '@/components/controls/RouteInfoBar'
+import EditControls from '@/components/controls/EditControls'
+import DeleteModeControls from '@/components/controls/DeleteModeControls'
+import RangeDeleteControls from '@/components/controls/RangeDeleteControls'
+import HistoryControls from '@/components/controls/HistoryControls'
+import RouteActions from '@/components/controls/RouteActions'
+import ModeIndicator from '@/components/controls/ModeIndicator'
+import MapStyleSelector from '@/components/controls/MapStyleSelector'
+import RouteColorPicker from '@/components/controls/RouteColorPicker'
 
 export default function MapControls() {
   return (

@@ -1,4 +1,4 @@
-import { RoutePoint, Waypoint } from '../types'
+import { RoutePoint, Waypoint } from '@/types'
 
 /**
  * Generate GPX file content from route points and waypoints

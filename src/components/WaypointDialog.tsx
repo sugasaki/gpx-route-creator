@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
-import { useUIStore } from '../store/uiStore'
-import { useRouteStore } from '../store/routeStore'
-import { WaypointType } from '../types'
+import { useUIStore } from '@/store/uiStore'
+import { useRouteStore } from '@/store/routeStore'
+import { WaypointType } from '@/types'
 
 interface WaypointFormData {
   name: string

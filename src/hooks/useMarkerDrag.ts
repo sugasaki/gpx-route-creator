@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react'
-import { useRouteStore } from '../store/routeStore'
-import { useUIStore } from '../store/uiStore'
-import { RoutePoint } from '../types'
+import { useRouteStore } from '@/store/routeStore'
+import { useUIStore } from '@/store/uiStore'
+import { RoutePoint } from '@/types'
 
 interface UseMarkerDragProps {
   point: RoutePoint

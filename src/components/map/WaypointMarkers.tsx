@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
 import { Marker, Popup } from 'react-map-gl/maplibre'
-import { useRouteStore } from '../../store/routeStore'
-import { useUIStore } from '../../store/uiStore'
-import { Waypoint, WaypointType } from '../../types'
+import { useRouteStore } from '@/store/routeStore'
+import { useUIStore } from '@/store/uiStore'
+import { Waypoint, WaypointType } from '@/types'
 
 // Waypointタイプごとのアイコン設定
 const getWaypointIcon = (type: WaypointType, isSelected: boolean): React.ReactNode => {

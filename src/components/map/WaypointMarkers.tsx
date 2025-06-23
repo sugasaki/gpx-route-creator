@@ -150,9 +150,9 @@ export default function WaypointMarkers() {
         
         /* ポップアップの閉じるボタンを大きくする */
         .waypoint-popup .maplibregl-popup-close-button {
-          font-size: 24px !important;
-          width: 36px !important;
-          height: 36px !important;
+          font-size: 32px !important;
+          width: 48px !important;
+          height: 48px !important;
           padding: 0 !important;
           display: flex !important;
           align-items: center !important;

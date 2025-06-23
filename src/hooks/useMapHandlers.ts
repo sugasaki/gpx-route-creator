@@ -10,7 +10,7 @@ interface UseMapHandlersProps {
 }
 
 export function useMapHandlers({ mapRef }: UseMapHandlersProps) {
-  const { route, addPoint, insertPoint } = useRouteStore()
+  const { route, addPoint, insertPoint, waypoints } = useRouteStore()
   const { editMode, hoveredPointId, setHoveredPoint, setPendingWaypoint, setWaypointDialogOpen } = useUIStore()
   
   // Set cursor based on edit mode
@@ -33,7 +33,26 @@ export function useMapHandlers({ mapRef }: UseMapHandlersProps) {
   
   const handleMapClick = useCallback((e: any) => {
     if (editMode === 'waypoint') {
-      // Waypointモード: ライン付近にWaypointを追加
+      // Waypointモード: 既存のWaypointマーカーをクリックしたかチェック
+      const clickRadius = 20 // Waypointマーカーのクリック判定半径（ピクセル）
+      
+      // 既存のWaypointとの距離をチェック
+      for (const waypoint of waypoints) {
+        const waypointPixel = mapRef.current?.project([waypoint.lng, waypoint.lat])
+        if (waypointPixel) {
+          const distance = Math.sqrt(
+            Math.pow(e.point.x - waypointPixel.x, 2) + 
+            Math.pow(e.point.y - waypointPixel.y, 2)
+          )
+          
+          // 既存のWaypointの近くをクリックした場合は、新規作成しない
+          if (distance < clickRadius) {
+            return
+          }
+        }
+      }
+      
+      // ライン付近にWaypointを追加
       if (route.points.length > 0) {
         // クリック位置の周囲も含めて検索（半径20ピクセル）
         const searchRadius = 20
@@ -93,26 +112,53 @@ export function useMapHandlers({ mapRef }: UseMapHandlersProps) {
         lng: e.lngLat.lng
       })
     }
-  }, [editMode, addPoint, insertPoint, route.points, setPendingWaypoint, setWaypointDialogOpen])
+  }, [editMode, addPoint, insertPoint, route.points, waypoints, setPendingWaypoint, setWaypointDialogOpen, mapRef])
   
   const handleMouseMove = useCallback((e: any) => {
     if (!mapRef.current) return
     
     // Waypointモードの場合、ライン付近でカーソルを変更
-    if (editMode === 'waypoint' && route.points.length >= 2) {
-      const searchRadius = 20
-      const bbox: [[number, number], [number, number]] = [
-        [e.point.x - searchRadius, e.point.y - searchRadius],
-        [e.point.x + searchRadius, e.point.y + searchRadius]
-      ]
-      
-      const features = mapRef.current.queryRenderedFeatures(bbox, {
-        layers: ['route-line']
-      })
-      
+    if (editMode === 'waypoint') {
       const canvas = mapRef.current.getCanvas()
-      if (features && features.length > 0) {
+      
+      // 既存のWaypoint上にカーソルがあるかチェック
+      const hoverRadius = 20
+      let isOverWaypoint = false
+      
+      for (const waypoint of waypoints) {
+        const waypointPixel = mapRef.current.project([waypoint.lng, waypoint.lat])
+        if (waypointPixel) {
+          const distance = Math.sqrt(
+            Math.pow(e.point.x - waypointPixel.x, 2) + 
+            Math.pow(e.point.y - waypointPixel.y, 2)
+          )
+          
+          if (distance < hoverRadius) {
+            isOverWaypoint = true
+            break
+          }
+        }
+      }
+      
+      if (isOverWaypoint) {
         canvas.style.cursor = 'pointer'
+      } else if (route.points.length >= 2) {
+        // ライン付近でカーソルを変更
+        const searchRadius = 20
+        const bbox: [[number, number], [number, number]] = [
+          [e.point.x - searchRadius, e.point.y - searchRadius],
+          [e.point.x + searchRadius, e.point.y + searchRadius]
+        ]
+        
+        const features = mapRef.current.queryRenderedFeatures(bbox, {
+          layers: ['route-line']
+        })
+        
+        if (features && features.length > 0) {
+          canvas.style.cursor = 'pointer'
+        } else {
+          canvas.style.cursor = 'crosshair'
+        }
       } else {
         canvas.style.cursor = 'crosshair'
       }
@@ -150,7 +196,7 @@ export function useMapHandlers({ mapRef }: UseMapHandlersProps) {
         setHoveredPoint(null)
       }
     }
-  }, [route.points, hoveredPointId, setHoveredPoint, editMode])
+  }, [route.points, hoveredPointId, setHoveredPoint, editMode, waypoints, mapRef])
   
   const handleMouseEnter = useCallback((e: any) => {
     if (editMode === 'create' && e.features && e.features.length > 0 && e.features[0].layer.id === 'route-line') {

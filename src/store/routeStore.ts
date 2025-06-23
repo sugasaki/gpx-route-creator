@@ -1,9 +1,10 @@
 import { create } from 'zustand'
-import { RoutePoint, Route } from '../types'
+import { RoutePoint, Route, Waypoint } from '../types'
 import { calculateDistance } from '../utils/geo'
 
 interface RouteState {
   route: Route
+  waypoints: Waypoint[]
   history: Route[]
   historyIndex: number
   addPoint: (point: Omit<RoutePoint, 'id'>) => void
@@ -13,6 +14,10 @@ interface RouteState {
   deleteMultiplePoints: (ids: string[]) => void
   movePoint: (id: string, lat: number, lng: number) => void
   movePointWithoutHistory: (id: string, lat: number, lng: number) => void
+  addWaypoint: (waypoint: Omit<Waypoint, 'id'>) => void
+  updateWaypoint: (id: string, waypoint: Partial<Waypoint>) => void
+  deleteWaypoint: (id: string) => void
+  moveWaypointOnRoute: (id: string, nearestPointIndex: number) => void
   saveCurrentStateToHistory: () => void
   undo: () => void
   redo: () => void
@@ -24,6 +29,7 @@ const generateId = () => Math.random().toString(36).substr(2, 9)
 
 export const useRouteStore = create<RouteState>((set, get) => ({
   route: { points: [], distance: 0 },
+  waypoints: [],
   history: [{ points: [], distance: 0 }],
   historyIndex: 0,
   
@@ -149,6 +155,7 @@ export const useRouteStore = create<RouteState>((set, get) => ({
     const emptyRoute = { points: [], distance: 0 }
     set({
       route: emptyRoute,
+      waypoints: [],
       history: [emptyRoute],
       historyIndex: 0
     })
@@ -158,6 +165,35 @@ export const useRouteStore = create<RouteState>((set, get) => ({
     const distance = calculateDistance(get().route.points)
     set(state => ({
       route: { ...state.route, distance }
+    }))
+  },
+  
+  addWaypoint: (waypoint) => {
+    const newWaypoint: Waypoint = { ...waypoint, id: generateId() }
+    set(state => ({
+      waypoints: [...state.waypoints, newWaypoint]
+    }))
+  },
+  
+  updateWaypoint: (id, updates) => {
+    set(state => ({
+      waypoints: state.waypoints.map(w => 
+        w.id === id ? { ...w, ...updates } : w
+      )
+    }))
+  },
+  
+  deleteWaypoint: (id) => {
+    set(state => ({
+      waypoints: state.waypoints.filter(w => w.id !== id)
+    }))
+  },
+  
+  moveWaypointOnRoute: (id, nearestPointIndex) => {
+    set(state => ({
+      waypoints: state.waypoints.map(w => 
+        w.id === id ? { ...w, nearestPointIndex } : w
+      )
     }))
   }
 }))

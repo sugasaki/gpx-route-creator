@@ -5,7 +5,9 @@ import MapControls from './MapControls'
 import MapContainer from './map/MapContainer'
 import RouteLine from './map/RouteLine'
 import RouteMarkers from './map/RouteMarkers'
+import WaypointMarkers from './map/WaypointMarkers'
 import SelectionOverlay from './SelectionOverlay'
+import WaypointDialog from './WaypointDialog'
 
 export default function MapComponent() {
   const mapRef = useRef<MapRef>(null)
@@ -28,10 +30,12 @@ export default function MapComponent() {
       >
         <RouteLine />
         <RouteMarkers />
+        <WaypointMarkers />
       </MapContainer>
       
       <SelectionOverlay mapRef={mapRef} />
       <MapControls />
+      <WaypointDialog />
     </div>
   )
 }

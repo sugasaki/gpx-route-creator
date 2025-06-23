@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { useRouteStore } from '../../store/routeStore'
 import { useUIStore } from '../../store/uiStore'
-import { PlusIcon, PencilIcon } from '@heroicons/react/24/outline'
+import { PlusIcon, PencilIcon, MapPinIcon } from '@heroicons/react/24/outline'
 
 export default function EditControls() {
   const { route } = useRouteStore()
@@ -11,7 +11,7 @@ export default function EditControls() {
   // ESCキーで作成モード・編集モードを解除
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if ((editMode === 'create' || editMode === 'edit') && e.key === 'Escape') {
+      if ((editMode === 'create' || editMode === 'edit' || editMode === 'waypoint') && e.key === 'Escape') {
         setEditMode('view')
       }
     }
@@ -62,6 +62,28 @@ export default function EditControls() {
         title="Edit route"
       >
         <PencilIcon className="w-5 h-5" />
+      </button>
+      
+      <button
+        onClick={() => {
+          if (editMode === 'waypoint') {
+            setEditMode('view')
+          } else {
+            setEditMode('waypoint')
+          }
+        }}
+        disabled={!hasRoute}
+        className={`
+          p-3 rounded-lg shadow-lg transition-all
+          ${editMode === 'waypoint'
+            ? 'bg-purple-500 text-white hover:bg-purple-600'
+            : 'bg-white text-gray-700 hover:bg-gray-100'
+          }
+          ${!hasRoute ? 'opacity-50 cursor-not-allowed' : ''}
+        `}
+        title="Add waypoints"
+      >
+        <MapPinIcon className="w-5 h-5" />
       </button>
     </>
   )

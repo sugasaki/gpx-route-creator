@@ -5,12 +5,12 @@ import { XMarkIcon, ArrowDownTrayIcon } from '@heroicons/react/24/outline'
 import ConfirmationDialog from '../ConfirmationDialog'
 
 export default function RouteActions() {
-  const { route, clearRoute } = useRouteStore()
+  const { route, waypoints, clearRoute } = useRouteStore()
   const hasRoute = route.points.length > 0
   const [showConfirmDialog, setShowConfirmDialog] = useState(false)
   
   const handleExportGPX = () => {
-    downloadGPX(route.points)
+    downloadGPX(route.points, waypoints)
   }
   
   const handleClearRoute = () => {

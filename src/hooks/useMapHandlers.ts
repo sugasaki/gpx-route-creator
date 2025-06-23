@@ -11,7 +11,7 @@ interface UseMapHandlersProps {
 
 export function useMapHandlers({ mapRef }: UseMapHandlersProps) {
   const { route, addPoint, insertPoint } = useRouteStore()
-  const { editMode, hoveredPointId, setHoveredPoint } = useUIStore()
+  const { editMode, hoveredPointId, setHoveredPoint, setPendingWaypoint, setWaypointDialogOpen } = useUIStore()
   
   // Set cursor based on edit mode
   useEffect(() => {
@@ -24,12 +24,31 @@ export function useMapHandlers({ mapRef }: UseMapHandlersProps) {
       canvas.style.cursor = 'pointer'
     } else if (editMode === 'delete-range') {
       canvas.style.cursor = 'crosshair'
+    } else if (editMode === 'waypoint') {
+      canvas.style.cursor = 'crosshair'
     } else {
       canvas.style.cursor = ''
     }
   }, [editMode, mapRef])
   
   const handleMapClick = useCallback((e: any) => {
+    if (editMode === 'waypoint') {
+      // Waypointモード: ライン上にWaypointを追加
+      const features = mapRef.current?.queryRenderedFeatures(e.point, {
+        layers: ['route-line']
+      })
+      
+      if (features && features.length > 0) {
+        // ライン上をクリックした場合のみWaypointを追加
+        setPendingWaypoint({
+          lat: e.lngLat.lat,
+          lng: e.lngLat.lng
+        })
+        setWaypointDialogOpen(true)
+      }
+      return
+    }
+    
     if (editMode !== 'create') return
     
     // Check if we clicked on the line
@@ -57,7 +76,7 @@ export function useMapHandlers({ mapRef }: UseMapHandlersProps) {
         lng: e.lngLat.lng
       })
     }
-  }, [editMode, addPoint, insertPoint, route.points])
+  }, [editMode, addPoint, insertPoint, route.points, setPendingWaypoint, setWaypointDialogOpen])
   
   const handleMouseMove = useCallback((e: any) => {
     if (!mapRef.current || route.points.length <= 2) return
@@ -105,6 +124,8 @@ export function useMapHandlers({ mapRef }: UseMapHandlersProps) {
     } else if (editMode === 'delete') {
       e.target.getCanvas().style.cursor = 'pointer'
     } else if (editMode === 'delete-range') {
+      e.target.getCanvas().style.cursor = 'crosshair'
+    } else if (editMode === 'waypoint') {
       e.target.getCanvas().style.cursor = 'crosshair'
     } else {
       e.target.getCanvas().style.cursor = ''

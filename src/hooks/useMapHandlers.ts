@@ -33,25 +33,35 @@ export function useMapHandlers({ mapRef }: UseMapHandlersProps) {
   
   const handleMapClick = useCallback((e: any) => {
     if (editMode === 'waypoint') {
-      // Waypointモード: ライン上にWaypointを追加
-      const features = mapRef.current?.queryRenderedFeatures(e.point, {
-        layers: ['route-line']
-      })
-      
-      if (features && features.length > 0 && route.points.length > 0) {
-        // ライン上の最も近い点を計算
-        const closestPoint = findClosestPointOnRoute(
-          e.lngLat.lat,
-          e.lngLat.lng,
-          route.points
-        )
+      // Waypointモード: ライン付近にWaypointを追加
+      if (route.points.length > 0) {
+        // クリック位置の周囲も含めて検索（半径20ピクセル）
+        const searchRadius = 20
+        const bbox: [[number, number], [number, number]] = [
+          [e.point.x - searchRadius, e.point.y - searchRadius],
+          [e.point.x + searchRadius, e.point.y + searchRadius]
+        ]
         
-        // 計算された点にWaypointを配置
-        setPendingWaypoint({
-          lat: closestPoint.lat,
-          lng: closestPoint.lng
+        const features = mapRef.current?.queryRenderedFeatures(bbox, {
+          layers: ['route-line']
         })
-        setWaypointDialogOpen(true)
+        
+        // ライン付近をクリックした場合、またはルートが存在する場合
+        if ((features && features.length > 0) || route.points.length >= 2) {
+          // ライン上の最も近い点を計算
+          const closestPoint = findClosestPointOnRoute(
+            e.lngLat.lat,
+            e.lngLat.lng,
+            route.points
+          )
+          
+          // 計算された点にWaypointを配置
+          setPendingWaypoint({
+            lat: closestPoint.lat,
+            lng: closestPoint.lng
+          })
+          setWaypointDialogOpen(true)
+        }
       }
       return
     }
@@ -86,7 +96,30 @@ export function useMapHandlers({ mapRef }: UseMapHandlersProps) {
   }, [editMode, addPoint, insertPoint, route.points, setPendingWaypoint, setWaypointDialogOpen])
   
   const handleMouseMove = useCallback((e: any) => {
-    if (!mapRef.current || route.points.length <= 2) return
+    if (!mapRef.current) return
+    
+    // Waypointモードの場合、ライン付近でカーソルを変更
+    if (editMode === 'waypoint' && route.points.length >= 2) {
+      const searchRadius = 20
+      const bbox: [[number, number], [number, number]] = [
+        [e.point.x - searchRadius, e.point.y - searchRadius],
+        [e.point.x + searchRadius, e.point.y + searchRadius]
+      ]
+      
+      const features = mapRef.current.queryRenderedFeatures(bbox, {
+        layers: ['route-line']
+      })
+      
+      const canvas = mapRef.current.getCanvas()
+      if (features && features.length > 0) {
+        canvas.style.cursor = 'pointer'
+      } else {
+        canvas.style.cursor = 'crosshair'
+      }
+    }
+    
+    // 中間点のホバー処理
+    if (route.points.length <= 2) return
     
     const { point } = e
     const threshold: number = MAP_CONSTANTS.HOVER_THRESHOLD_PIXELS
@@ -117,7 +150,7 @@ export function useMapHandlers({ mapRef }: UseMapHandlersProps) {
         setHoveredPoint(null)
       }
     }
-  }, [route.points, hoveredPointId, setHoveredPoint])
+  }, [route.points, hoveredPointId, setHoveredPoint, editMode])
   
   const handleMouseEnter = useCallback((e: any) => {
     if (editMode === 'create' && e.features && e.features.length > 0 && e.features[0].layer.id === 'route-line') {

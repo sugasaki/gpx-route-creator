@@ -2,7 +2,7 @@ import { useCallback, RefObject, useEffect } from 'react'
 import { MapRef } from 'react-map-gl/maplibre'
 import { useRouteStore } from '@/store/routeStore'
 import { useUIStore } from '@/store/uiStore'
-import { findClosestSegmentIndex } from '@/utils/geo'
+import { findClosestSegmentIndex, findClosestPointOnRoute } from '@/utils/geo'
 import { MAP_CONSTANTS } from '@/constants/map'
 
 interface UseMapHandlersProps {
@@ -38,11 +38,18 @@ export function useMapHandlers({ mapRef }: UseMapHandlersProps) {
         layers: ['route-line']
       })
       
-      if (features && features.length > 0) {
-        // ライン上をクリックした場合のみWaypointを追加
+      if (features && features.length > 0 && route.points.length > 0) {
+        // ライン上の最も近い点を計算
+        const closestPoint = findClosestPointOnRoute(
+          e.lngLat.lat,
+          e.lngLat.lng,
+          route.points
+        )
+        
+        // 計算された点にWaypointを配置
         setPendingWaypoint({
-          lat: e.lngLat.lat,
-          lng: e.lngLat.lng
+          lat: closestPoint.lat,
+          lng: closestPoint.lng
         })
         setWaypointDialogOpen(true)
       }

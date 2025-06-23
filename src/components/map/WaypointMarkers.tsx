@@ -111,8 +111,8 @@ export default function WaypointMarkers() {
         }
         
         .waypoint-marker {
-          width: 32px;
-          height: 32px;
+          width: 38px;
+          height: 38px;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -130,8 +130,8 @@ export default function WaypointMarkers() {
         }
         
         .waypoint-marker svg {
-          width: 24px;
-          height: 24px;
+          width: 29px;
+          height: 29px;
         }
       `}</style>
     </>

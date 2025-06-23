@@ -80,3 +80,55 @@ export function findClosestSegmentIndex(
   
   return insertIndex
 }
+
+/**
+ * Find the closest point on the route line to a given point
+ */
+export function findClosestPointOnRoute(
+  clickLat: number,
+  clickLng: number,
+  points: RoutePoint[]
+): { lat: number; lng: number; nearestPointIndex: number } {
+  let minDistance = Infinity
+  let closestPoint = { lat: clickLat, lng: clickLng }
+  let nearestPointIndex = 0
+  
+  for (let i = 0; i < points.length - 1; i++) {
+    const p1 = points[i]
+    const p2 = points[i + 1]
+    
+    const dx = p2.lng - p1.lng
+    const dy = p2.lat - p1.lat
+    
+    if (dx === 0 && dy === 0) {
+      // Segment is a point
+      const distance = Math.sqrt((clickLng - p1.lng) ** 2 + (clickLat - p1.lat) ** 2)
+      if (distance < minDistance) {
+        minDistance = distance
+        closestPoint = { lat: p1.lat, lng: p1.lng }
+        nearestPointIndex = i
+      }
+      continue
+    }
+    
+    // Calculate projection parameter t
+    const t = Math.max(0, Math.min(1, 
+      ((clickLng - p1.lng) * dx + (clickLat - p1.lat) * dy) / (dx * dx + dy * dy)
+    ))
+    
+    // Find the closest point on the segment
+    const closestLng = p1.lng + t * dx
+    const closestLat = p1.lat + t * dy
+    
+    // Calculate distance
+    const distance = Math.sqrt((clickLng - closestLng) ** 2 + (clickLat - closestLat) ** 2)
+    
+    if (distance < minDistance) {
+      minDistance = distance
+      closestPoint = { lat: closestLat, lng: closestLng }
+      nearestPointIndex = i
+    }
+  }
+  
+  return { ...closestPoint, nearestPointIndex }
+}

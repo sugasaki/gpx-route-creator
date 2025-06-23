@@ -87,6 +87,7 @@ function WaypointMarker({ waypoint }: { waypoint: Waypoint }) {
           onClose={() => setShowPopup(false)}
           closeButton={true}
           closeOnClick={false}
+          className="waypoint-popup"
         >
           <div className="p-2 min-w-[150px]">
             <h3 className="font-bold">{waypoint.name}</h3>
@@ -145,6 +146,34 @@ export default function WaypointMarkers() {
         /* ドラッグ中のカーソル */
         .maplibregl-dragging .waypoint-marker {
           cursor: grabbing !important;
+        }
+        
+        /* ポップアップの閉じるボタンを大きくする */
+        .waypoint-popup .maplibregl-popup-close-button {
+          font-size: 24px !important;
+          width: 36px !important;
+          height: 36px !important;
+          padding: 0 !important;
+          display: flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+          border-radius: 50% !important;
+          background-color: rgba(255, 255, 255, 0.9) !important;
+          border: 1px solid rgba(0, 0, 0, 0.1) !important;
+          top: 4px !important;
+          right: 4px !important;
+        }
+        
+        .waypoint-popup .maplibregl-popup-close-button:hover {
+          background-color: #f3f4f6 !important;
+          border-color: rgba(0, 0, 0, 0.2) !important;
+        }
+        
+        /* ポップアップ全体の調整 */
+        .waypoint-popup .maplibregl-popup-content {
+          padding: 0 !important;
+          border-radius: 8px !important;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
         }
       `}</style>
     </>

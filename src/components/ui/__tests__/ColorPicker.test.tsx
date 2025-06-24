@@ -77,4 +77,27 @@ describe('ColorPicker', () => {
     expect(screen.getByTitle('カスタム1')).toBeInTheDocument()
     expect(screen.getByTitle('カスタム2')).toBeInTheDocument()
   })
+
+  it('カスタムプリセット色をクリックしてonChangeが呼ばれる', () => {
+    const customColors = [
+      { name: 'カスタム1', value: '#123456' },
+      { name: 'カスタム2', value: '#abcdef' }
+    ]
+
+    render(
+      <ColorPicker 
+        value="#3b82f6" 
+        onChange={mockOnChange}
+        presetColors={customColors}
+      />
+    )
+
+    const button = screen.getByRole('button')
+    fireEvent.click(button)
+
+    const customButton = screen.getByTitle('カスタム2')
+    fireEvent.click(customButton)
+
+    expect(mockOnChange).toHaveBeenCalledWith('#abcdef')
+  })
 })

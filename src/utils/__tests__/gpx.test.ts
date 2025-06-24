@@ -80,18 +80,20 @@ describe('GPX Utils', () => {
   })
 
   describe('downloadGPX', () => {
+    let mockAnchor: any
+
     beforeEach(() => {
       // DOM APIのモック
       global.URL.createObjectURL = vi.fn(() => 'mock-url')
       global.URL.revokeObjectURL = vi.fn()
       
       // DOM要素のモック
-      const mockAnchor = {
+      mockAnchor = {
         href: '',
         download: '',
         click: vi.fn()
       }
-      global.document.createElement = vi.fn(() => mockAnchor as any)
+      global.document.createElement = vi.fn(() => mockAnchor)
     })
 
     it('ルートポイントがある場合にダウンロードが実行される', () => {
@@ -103,6 +105,9 @@ describe('GPX Utils', () => {
 
       expect(global.URL.createObjectURL).toHaveBeenCalled()
       expect(global.document.createElement).toHaveBeenCalledWith('a')
+      expect(mockAnchor.download).toBe('test.gpx')
+      expect(mockAnchor.click).toHaveBeenCalled()
+      expect(global.URL.revokeObjectURL).toHaveBeenCalledWith('mock-url')
     })
 
     it('ルートポイントが空の場合はダウンロードが実行されない', () => {

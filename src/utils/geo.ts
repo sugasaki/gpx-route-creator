@@ -1,54 +1,35 @@
+import * as turf from 'turf'
 import { RoutePoint } from '@/types'
 
 /**
- * Calculate distance from point to line segment
+ * Calculate distance from point to line segment (for backward compatibility)
+ * This is kept for any code that might still be using it
  */
 export function distanceToSegment(
   px: number, py: number, // point
   x1: number, y1: number, // segment start
   x2: number, y2: number  // segment end
 ): number {
-  const dx = x2 - x1
-  const dy = y2 - y1
-  
-  if (dx === 0 && dy === 0) {
-    // Segment is a point
-    return Math.sqrt((px - x1) ** 2 + (py - y1) ** 2)
-  }
-  
-  // Calculate projection parameter t
-  const t = Math.max(0, Math.min(1, ((px - x1) * dx + (py - y1) * dy) / (dx * dx + dy * dy)))
-  
-  // Find the closest point on the segment
-  const closestX = x1 + t * dx
-  const closestY = y1 + t * dy
-  
-  // Calculate distance
-  return Math.sqrt((px - closestX) ** 2 + (py - closestY) ** 2)
+  const pt = turf.point([py, px])
+  const line = turf.lineString([[y1, x1], [y2, x2]])
+  // Use point on line function  
+  const nearestPt = turf.pointOnLine(line, pt)
+  return turf.distance(pt, nearestPt, 'degrees')
 }
 
 /**
- * Calculate distance between route points using Haversine formula
+ * Calculate distance between route points using Turf.js
  */
 export function calculateDistance(points: RoutePoint[]): number {
-  let distance = 0
-  for (let i = 1; i < points.length; i++) {
-    const prev = points[i - 1]
-    const curr = points[i]
-    
-    const R = 6371000 // Earth radius in meters
-    const dLat = (curr.lat - prev.lat) * Math.PI / 180
-    const dLon = (curr.lng - prev.lng) * Math.PI / 180
-    const a = 
-      Math.sin(dLat/2) * Math.sin(dLat/2) +
-      Math.cos(prev.lat * Math.PI / 180) * Math.cos(curr.lat * Math.PI / 180) *
-      Math.sin(dLon/2) * Math.sin(dLon/2)
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))
-    const d = R * c
-    
-    distance += d
-  }
-  return distance
+  if (points.length < 2) return 0
+  
+  // Convert RoutePoints to GeoJSON LineString
+  const line = turf.lineString(
+    points.map(p => [p.lng, p.lat])
+  )
+  
+  // Calculate length in meters
+  return turf.lineDistance(line, 'meters')
 }
 
 /**
@@ -59,24 +40,79 @@ export function findClosestSegmentIndex(
   clickLng: number,
   points: RoutePoint[]
 ): number {
+  if (points.length < 2) return 1
+  
+  const clickPoint = turf.point([clickLng, clickLat])
   let minDistance = Infinity
   let insertIndex = 1
   
   for (let i = 0; i < points.length - 1; i++) {
-    const p1 = points[i]
-    const p2 = points[i + 1]
+    const segment = turf.lineString([
+      [points[i].lng, points[i].lat],
+      [points[i + 1].lng, points[i + 1].lat]
+    ])
     
-    const segmentDistance = distanceToSegment(
-      clickLat, clickLng,
-      p1.lat, p1.lng,
-      p2.lat, p2.lng
-    )
+    // Use point on line and calculate distance
+    const nearestPt = turf.pointOnLine(segment, clickPoint)
+    const distance = turf.distance(clickPoint, nearestPt, 'degrees')
     
-    if (segmentDistance < minDistance) {
-      minDistance = segmentDistance
+    if (distance < minDistance) {
+      minDistance = distance
       insertIndex = i + 1
     }
   }
   
   return insertIndex
+}
+
+/**
+ * Find the closest point on the route line to a given point
+ */
+export function findClosestPointOnRoute(
+  clickLat: number,
+  clickLng: number,
+  points: RoutePoint[]
+): { lat: number; lng: number; nearestPointIndex: number } {
+  if (points.length < 2) {
+    return { lat: clickLat, lng: clickLng, nearestPointIndex: 0 }
+  }
+  
+  const clickPoint = turf.point([clickLng, clickLat])
+  const line = turf.lineString(
+    points.map(p => [p.lng, p.lat])
+  )
+  
+  // Find the nearest point on the line
+  const snapped = turf.pointOnLine(line, clickPoint)
+  
+  // Find which segment the snapped point is on
+  let nearestPointIndex = 0
+  const snappedCoords = snapped.geometry.coordinates
+  
+  // Check which segment contains the snapped point
+  for (let i = 0; i < points.length - 1; i++) {
+    const segment = turf.lineString([
+      [points[i].lng, points[i].lat],
+      [points[i + 1].lng, points[i + 1].lat]
+    ])
+    
+    // Check if the snapped point lies on this segment
+    const nearestOnSegment = turf.pointOnLine(segment, turf.point(snappedCoords))
+    const distanceToSegment = turf.distance(
+      turf.point(snappedCoords), 
+      nearestOnSegment, 
+      'degrees'
+    )
+    
+    if (distanceToSegment < 0.0000001) { // Very small threshold for floating point comparison
+      nearestPointIndex = i
+      break
+    }
+  }
+  
+  return {
+    lat: snappedCoords[1],
+    lng: snappedCoords[0],
+    nearestPointIndex
+  }
 }

@@ -4,6 +4,7 @@ import { useRouteStore } from '@/store/routeStore'
 import { useUIStore } from '@/store/uiStore'
 import { findClosestSegmentIndex } from '@/utils/geo'
 import { MAP_CONSTANTS } from '@/constants/map'
+import { useWaypointHandlers } from './useWaypointHandlers'
 
 interface UseMapHandlersProps {
   mapRef: RefObject<MapRef | null>
@@ -12,6 +13,7 @@ interface UseMapHandlersProps {
 export function useMapHandlers({ mapRef }: UseMapHandlersProps) {
   const { route, addPoint, insertPoint } = useRouteStore()
   const { editMode, hoveredPointId, setHoveredPoint } = useUIStore()
+  const { handleWaypointModeClick, getCursorForWaypointMode } = useWaypointHandlers({ mapRef })
   
   // Set cursor based on edit mode
   useEffect(() => {
@@ -24,12 +26,19 @@ export function useMapHandlers({ mapRef }: UseMapHandlersProps) {
       canvas.style.cursor = 'pointer'
     } else if (editMode === 'delete-range') {
       canvas.style.cursor = 'crosshair'
+    } else if (editMode === 'waypoint') {
+      canvas.style.cursor = 'crosshair'
     } else {
       canvas.style.cursor = ''
     }
   }, [editMode, mapRef])
   
   const handleMapClick = useCallback((e: any) => {
+    // Waypointモードの処理を委譲
+    if (handleWaypointModeClick(e)) {
+      return
+    }
+    
     if (editMode !== 'create') return
     
     // Check if we clicked on the line
@@ -57,10 +66,19 @@ export function useMapHandlers({ mapRef }: UseMapHandlersProps) {
         lng: e.lngLat.lng
       })
     }
-  }, [editMode, addPoint, insertPoint, route.points])
+  }, [editMode, addPoint, insertPoint, route.points, handleWaypointModeClick, mapRef])
   
   const handleMouseMove = useCallback((e: any) => {
-    if (!mapRef.current || route.points.length <= 2) return
+    if (!mapRef.current) return
+    
+    // Waypointモードのカーソル処理
+    const waypointCursor = getCursorForWaypointMode(e.point.x, e.point.y)
+    if (waypointCursor) {
+      mapRef.current.getCanvas().style.cursor = waypointCursor
+    }
+    
+    // 中間点のホバー処理
+    if (route.points.length <= 2) return
     
     const { point } = e
     const threshold: number = MAP_CONSTANTS.HOVER_THRESHOLD_PIXELS
@@ -91,10 +109,12 @@ export function useMapHandlers({ mapRef }: UseMapHandlersProps) {
         setHoveredPoint(null)
       }
     }
-  }, [route.points, hoveredPointId, setHoveredPoint])
+  }, [route.points, hoveredPointId, setHoveredPoint, getCursorForWaypointMode, mapRef])
   
   const handleMouseEnter = useCallback((e: any) => {
     if (editMode === 'create' && e.features && e.features.length > 0 && e.features[0].layer.id === 'route-line') {
+      e.target.getCanvas().style.cursor = 'pointer'
+    } else if (editMode === 'waypoint' && e.features && e.features.length > 0 && e.features[0].layer.id === 'route-line') {
       e.target.getCanvas().style.cursor = 'pointer'
     }
   }, [editMode])
@@ -105,6 +125,8 @@ export function useMapHandlers({ mapRef }: UseMapHandlersProps) {
     } else if (editMode === 'delete') {
       e.target.getCanvas().style.cursor = 'pointer'
     } else if (editMode === 'delete-range') {
+      e.target.getCanvas().style.cursor = 'crosshair'
+    } else if (editMode === 'waypoint') {
       e.target.getCanvas().style.cursor = 'crosshair'
     } else {
       e.target.getCanvas().style.cursor = ''

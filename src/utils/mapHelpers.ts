@@ -1,7 +1,7 @@
 import { RoutePoint } from '@/types'
 
 /**
- * Generate GeoJSON for route line
+ * ルートラインのGeoJSONを生成
  */
 export function getLineGeoJSON(points: RoutePoint[]) {
   return {
@@ -15,7 +15,7 @@ export function getLineGeoJSON(points: RoutePoint[]) {
 }
 
 /**
- * Get marker color based on state
+ * 状態に基づいてマーカーの色を取得
  */
 export function getMarkerColor(
   isDragging: boolean,

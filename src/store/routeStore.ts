@@ -186,7 +186,6 @@ export const useRouteStore = create<RouteState>((set, get) => ({
   
   addWaypoint: (waypoint) => {
     const state = get()
-    console.log('addWaypoint called with:', waypoint)
     
     // nearestPointIndexが設定されている場合、始点からの距離を計算
     const distanceFromStart = waypoint.nearestPointIndex !== undefined
@@ -198,7 +197,6 @@ export const useRouteStore = create<RouteState>((set, get) => ({
       id: generateId(),
       distanceFromStart
     }
-    console.log('Created new waypoint:', newWaypoint)
     
     set(state => ({
       waypoints: [...state.waypoints, newWaypoint]
@@ -233,19 +231,8 @@ export const useRouteStore = create<RouteState>((set, get) => ({
   
   updateWaypointDistances: () => {
     const state = get()
-    console.log('updateWaypointDistances called', {
-      routePoints: state.route.points.length,
-      waypoints: state.waypoints
-    })
     
     const updatedWaypoints = state.waypoints.map(waypoint => {
-      console.log('Processing waypoint:', {
-        name: waypoint.name,
-        nearestPointIndex: waypoint.nearestPointIndex,
-        lat: waypoint.lat,
-        lng: waypoint.lng,
-        currentDistanceFromStart: waypoint.distanceFromStart
-      })
       
       // nearestPointIndexがない場合は、最も近いポイントを探す
       let nearestIndex = waypoint.nearestPointIndex
@@ -257,18 +244,18 @@ export const useRouteStore = create<RouteState>((set, get) => ({
           state.route.points
         )
         nearestIndex = closestPoint.nearestPointIndex
-        console.log('Found nearest index for waypoint', waypoint.name, nearestIndex)
+        
       }
       
       if (nearestIndex !== undefined) {
         const distanceFromStart = calculateDistanceToIndex(state.route.points, nearestIndex)
-        console.log('Calculated distance for waypoint', waypoint.name, 'index:', nearestIndex, 'distance:', distanceFromStart)
+        
         return { ...waypoint, nearestPointIndex: nearestIndex, distanceFromStart }
       }
       return waypoint
     })
     
-    console.log('Updated waypoints:', updatedWaypoints)
+    
     set({ waypoints: updatedWaypoints })
   }
 }))

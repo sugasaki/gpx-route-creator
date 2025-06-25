@@ -229,6 +229,11 @@ export const useRouteStore = create<RouteState>((set, get) => ({
   
   updateWaypointDistances: () => {
     const state = get()
+    console.log('updateWaypointDistances called', {
+      routePoints: state.route.points.length,
+      waypoints: state.waypoints
+    })
+    
     const updatedWaypoints = state.waypoints.map(waypoint => {
       // nearestPointIndexがない場合は、最も近いポイントを探す
       let nearestIndex = waypoint.nearestPointIndex
@@ -240,15 +245,18 @@ export const useRouteStore = create<RouteState>((set, get) => ({
           state.route.points
         )
         nearestIndex = closestPoint.nearestPointIndex
+        console.log('Found nearest index for waypoint', waypoint.name, nearestIndex)
       }
       
       if (nearestIndex !== undefined) {
         const distanceFromStart = calculateDistanceToIndex(state.route.points, nearestIndex)
+        console.log('Calculated distance for waypoint', waypoint.name, distanceFromStart)
         return { ...waypoint, nearestPointIndex: nearestIndex, distanceFromStart }
       }
       return waypoint
     })
     
+    console.log('Updated waypoints:', updatedWaypoints)
     set({ waypoints: updatedWaypoints })
   }
 }))

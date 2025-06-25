@@ -10,13 +10,17 @@ export function useInitializeWaypointDistances() {
   const updateWaypointDistances = useRouteStore((state) => state.updateWaypointDistances)
   
   useEffect(() => {
-    // ルートとWaypointが存在し、距離情報がないWaypointがある場合
-    const hasUninitializedWaypoints = waypoints.some(
-      w => w.nearestPointIndex !== undefined && w.distanceFromStart === undefined
-    )
+    // デバッグログ
+    console.log('Initializing waypoint distances...', {
+      routePoints: route.points.length,
+      waypoints: waypoints.length,
+      waypointsData: waypoints
+    })
     
-    if (route.points.length >= 2 && waypoints.length > 0 && hasUninitializedWaypoints) {
+    // ルートとWaypointが存在する場合
+    if (route.points.length >= 2 && waypoints.length > 0) {
+      console.log('Updating waypoint distances...')
       updateWaypointDistances()
     }
-  }, []) // 初回マウントのみ実行
+  }, [route.points.length, waypoints.length]) // ルートやWaypointが変更されたら実行
 }

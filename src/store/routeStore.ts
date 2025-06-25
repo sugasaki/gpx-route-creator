@@ -186,6 +186,8 @@ export const useRouteStore = create<RouteState>((set, get) => ({
   
   addWaypoint: (waypoint) => {
     const state = get()
+    console.log('addWaypoint called with:', waypoint)
+    
     // nearestPointIndexが設定されている場合、始点からの距離を計算
     const distanceFromStart = waypoint.nearestPointIndex !== undefined
       ? calculateDistanceToIndex(state.route.points, waypoint.nearestPointIndex)
@@ -196,6 +198,8 @@ export const useRouteStore = create<RouteState>((set, get) => ({
       id: generateId(),
       distanceFromStart
     }
+    console.log('Created new waypoint:', newWaypoint)
+    
     set(state => ({
       waypoints: [...state.waypoints, newWaypoint]
     }))

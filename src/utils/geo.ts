@@ -73,6 +73,12 @@ export function findClosestPointOnRoute(
   clickLng: number,
   points: RoutePoint[]
 ): { lat: number; lng: number; nearestPointIndex: number } {
+  console.log('findClosestPointOnRoute called:', {
+    clickLat,
+    clickLng,
+    pointsLength: points.length
+  })
+  
   if (points.length < 2) {
     return { lat: clickLat, lng: clickLng, nearestPointIndex: 0 }
   }
@@ -84,6 +90,7 @@ export function findClosestPointOnRoute(
   
   // Find the nearest point on the line
   const snapped = turf.pointOnLine(line, clickPoint)
+  console.log('Snapped point:', snapped.geometry.coordinates)
   
   // Find which segment the snapped point is on
   let nearestPointIndex = 0
@@ -104,11 +111,16 @@ export function findClosestPointOnRoute(
       'degrees'
     )
     
+    console.log(`Segment ${i}: distance = ${distanceToSegment}`)
+    
     if (distanceToSegment < 0.0000001) { // Very small threshold for floating point comparison
       nearestPointIndex = i
+      console.log(`Found nearest segment: ${i}`)
       break
     }
   }
+  
+  console.log('Final nearestPointIndex:', nearestPointIndex)
   
   return {
     lat: snappedCoords[1],

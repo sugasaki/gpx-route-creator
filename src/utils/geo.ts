@@ -94,6 +94,7 @@ export function findClosestPointOnRoute(
   
   // Find which segment the snapped point is on
   let nearestPointIndex = 0
+  let minDistance = Infinity
   const snappedCoords = snapped.geometry.coordinates
   
   // Check which segment contains the snapped point
@@ -113,14 +114,15 @@ export function findClosestPointOnRoute(
     
     console.log(`Segment ${i}: distance = ${distanceToSegment}`)
     
-    if (distanceToSegment < 0.0000001) { // Very small threshold for floating point comparison
+    // 最小距離のセグメントを記録
+    if (distanceToSegment < minDistance) {
+      minDistance = distanceToSegment
       nearestPointIndex = i
-      console.log(`Found nearest segment: ${i}`)
-      break
+      console.log(`New minimum found at segment ${i} with distance ${distanceToSegment}`)
     }
   }
   
-  console.log('Final nearestPointIndex:', nearestPointIndex)
+  console.log('Final nearestPointIndex:', nearestPointIndex, 'with min distance:', minDistance)
   
   return {
     lat: snappedCoords[1],

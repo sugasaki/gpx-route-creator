@@ -127,15 +127,42 @@ export function calculateDistanceToIndex(
   points: RoutePoint[],
   targetIndex: number
 ): number {
-  if (points.length < 2 || targetIndex <= 0) return 0
+  console.log('calculateDistanceToIndex called with:', {
+    pointsLength: points.length,
+    targetIndex: targetIndex
+  })
+  
+  if (points.length < 2 || targetIndex < 0) {
+    console.log('Returning 0 because:', {
+      pointsLength: points.length,
+      targetIndex: targetIndex,
+      condition: 'points.length < 2 || targetIndex < 0'
+    })
+    return 0
+  }
+  
+  // インデックス0の場合も距離は0
+  if (targetIndex === 0) {
+    console.log('Returning 0 for index 0 (start point)')
+    return 0
+  }
   
   // Limit targetIndex to valid range
   const limitedIndex = Math.min(targetIndex, points.length - 1)
   
   // Create sub-route from start to target index
   const subRoute = points.slice(0, limitedIndex + 1)
+  console.log('Calculating distance for sub-route:', {
+    subRouteLength: subRoute.length,
+    limitedIndex: limitedIndex
+  })
   
   // Convert to meters then to kilometers
   const distanceMeters = calculateDistance(subRoute)
-  return distanceMeters / 1000
+  const distanceKm = distanceMeters / 1000
+  console.log('Distance calculated:', {
+    distanceMeters: distanceMeters,
+    distanceKm: distanceKm
+  })
+  return distanceKm
 }

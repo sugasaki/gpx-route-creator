@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { useUIStore } from '@/store/uiStore'
 import { useRouteStore } from '@/store/routeStore'
 import { WaypointType } from '@/types'
+import { calculateDistanceToIndex } from '@/utils/geo'
 
 interface WaypointFormData {
   name: string
@@ -27,6 +28,7 @@ export default function WaypointDialog() {
   const setSelectedWaypoint = useUIStore((state) => state.setSelectedWaypoint)
   
   const waypoints = useRouteStore((state) => state.waypoints)
+  const route = useRouteStore((state) => state.route)
   const addWaypoint = useRouteStore((state) => state.addWaypoint)
   const updateWaypoint = useRouteStore((state) => state.updateWaypoint)
   const deleteWaypoint = useRouteStore((state) => state.deleteWaypoint)
@@ -40,6 +42,14 @@ export default function WaypointDialog() {
   // 選択されたWaypointがある場合は編集モード
   const isEditMode = !!selectedWaypointId
   const selectedWaypoint = waypoints.find(w => w.id === selectedWaypointId)
+  
+  // 新規作成時の距離を計算
+  const pendingWaypointDistance = useMemo(() => {
+    if (pendingWaypoint && pendingWaypoint.nearestPointIndex !== undefined) {
+      return calculateDistanceToIndex(route.points, pendingWaypoint.nearestPointIndex)
+    }
+    return undefined
+  }, [pendingWaypoint, route.points])
   
   useEffect(() => {
     if (isEditMode && selectedWaypoint) {
@@ -125,13 +135,12 @@ export default function WaypointDialog() {
           </h2>
           
           {/* 距離情報 */}
-          {(selectedWaypoint?.distanceFromStart !== undefined || 
-            (pendingWaypoint && pendingWaypoint.nearestPointIndex !== undefined)) && (
+          {(selectedWaypoint?.distanceFromStart !== undefined || pendingWaypointDistance !== undefined) && (
             <div className="mb-4 p-3 bg-gray-50 rounded-lg">
               <p className="text-sm text-gray-600">
                 開始地点からの距離: 
                 <span className="font-semibold ml-1">
-                  {selectedWaypoint?.distanceFromStart?.toFixed(1) || '計算中...'}km
+                  {(selectedWaypoint?.distanceFromStart ?? pendingWaypointDistance)?.toFixed(1)}km
                 </span>
               </p>
             </div>

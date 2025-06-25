@@ -116,3 +116,26 @@ export function findClosestPointOnRoute(
     nearestPointIndex
   }
 }
+
+/**
+ * Calculate distance from route start to a specific point index
+ * @param points Route points array
+ * @param targetIndex Index to calculate distance to
+ * @returns Distance in kilometers
+ */
+export function calculateDistanceToIndex(
+  points: RoutePoint[],
+  targetIndex: number
+): number {
+  if (points.length < 2 || targetIndex <= 0) return 0
+  
+  // Limit targetIndex to valid range
+  const limitedIndex = Math.min(targetIndex, points.length - 1)
+  
+  // Create sub-route from start to target index
+  const subRoute = points.slice(0, limitedIndex + 1)
+  
+  // Convert to meters then to kilometers
+  const distanceMeters = calculateDistance(subRoute)
+  return distanceMeters / 1000
+}

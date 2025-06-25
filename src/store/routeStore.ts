@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { RoutePoint, Route, Waypoint } from '@/types'
-import { calculateDistance, calculateDistanceToIndex } from '@/utils/geo'
+import { calculateDistance, calculateDistanceToIndex, findClosestPointOnRoute } from '@/utils/geo'
 
 interface RouteState {
   route: Route
@@ -230,9 +230,21 @@ export const useRouteStore = create<RouteState>((set, get) => ({
   updateWaypointDistances: () => {
     const state = get()
     const updatedWaypoints = state.waypoints.map(waypoint => {
-      if (waypoint.nearestPointIndex !== undefined) {
-        const distanceFromStart = calculateDistanceToIndex(state.route.points, waypoint.nearestPointIndex)
-        return { ...waypoint, distanceFromStart }
+      // nearestPointIndexがない場合は、最も近いポイントを探す
+      let nearestIndex = waypoint.nearestPointIndex
+      if (nearestIndex === undefined && state.route.points.length >= 2) {
+        // ルート上の最も近い点を見つける
+        const closestPoint = findClosestPointOnRoute(
+          waypoint.lat,
+          waypoint.lng,
+          state.route.points
+        )
+        nearestIndex = closestPoint.nearestPointIndex
+      }
+      
+      if (nearestIndex !== undefined) {
+        const distanceFromStart = calculateDistanceToIndex(state.route.points, nearestIndex)
+        return { ...waypoint, nearestPointIndex: nearestIndex, distanceFromStart }
       }
       return waypoint
     })

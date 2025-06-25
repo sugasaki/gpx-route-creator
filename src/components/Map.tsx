@@ -1,6 +1,7 @@
 import { useRef } from 'react'
 import { MapRef } from 'react-map-gl/maplibre'
 import { useMapHandlers } from '@/hooks/useMapHandlers'
+import { useInitializeWaypointDistances } from '@/hooks/useInitializeWaypointDistances'
 import MapControls from '@/components/MapControls'
 import MapContainer from '@/components/map/MapContainer'
 import RouteLine from '@/components/map/RouteLine'
@@ -12,6 +13,9 @@ import WaypointDialog from '@/components/WaypointDialog'
 
 export default function MapComponent() {
   const mapRef = useRef<MapRef>(null)
+  
+  // 既存のWaypointの距離を初期化
+  useInitializeWaypointDistances()
   
   const {
     handleMapClick,

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { generateDistanceMarkers, filterMarkersInViewport, formatDistance, markersToGeoJSON } from '../distanceMarkers'
+import { generateDistanceMarkers, filterMarkersInViewport, formatDistance, markersToGeoJSON, calculateOptimalInterval } from '../distanceMarkers'
 import { RoutePoint } from '@/types'
 
 describe('distanceMarkers', () => {
@@ -10,13 +10,29 @@ describe('distanceMarkers', () => {
       expect(generateDistanceMarkers([])).toEqual([])
     })
 
-    it('間隔が0以下の場合は空配列を返す', () => {
+    it('明示的に間隔が0以下の場合は空配列を返す', () => {
       const points: RoutePoint[] = [
         { id: '1', lat: 35.681236, lng: 139.767125 },
         { id: '2', lat: 35.691236, lng: 139.777125 }
       ]
       expect(generateDistanceMarkers(points, 0)).toEqual([])
       expect(generateDistanceMarkers(points, -1)).toEqual([])
+    })
+    
+    it('間隔を指定しない場合は自動計算される', () => {
+      // 約3kmのルート
+      const points: RoutePoint[] = [
+        { id: '1', lat: 35.681236, lng: 139.767125 },
+        { id: '2', lat: 35.691236, lng: 139.777125 },
+        { id: '3', lat: 35.701236, lng: 139.787125 }
+      ]
+      
+      const markers = generateDistanceMarkers(points)
+      
+      // 3km未満なので1km間隔、つまり1kmと2kmのマーカーが生成される
+      expect(markers).toHaveLength(2)
+      expect(markers[0].distance).toBe(1)
+      expect(markers[1].distance).toBe(2)
     })
 
     it('1km間隔でマーカーを生成する', () => {
@@ -126,6 +142,21 @@ describe('distanceMarkers', () => {
       expect(formatDistance(10.6)).toBe('11')
       expect(formatDistance(25.3)).toBe('25')
       expect(formatDistance(100.8)).toBe('101')
+    })
+  })
+
+  describe('calculateOptimalInterval', () => {
+    it('距離に応じて適切な間隔を返す', () => {
+      expect(calculateOptimalInterval(5)).toBe(1) // 0-10km
+      expect(calculateOptimalInterval(10)).toBe(1) // 0-10km
+      expect(calculateOptimalInterval(11)).toBe(5) // 10-50km
+      expect(calculateOptimalInterval(50)).toBe(5) // 10-50km
+      expect(calculateOptimalInterval(51)).toBe(10) // 50-100km
+      expect(calculateOptimalInterval(100)).toBe(10) // 50-100km
+      expect(calculateOptimalInterval(101)).toBe(20) // 100-500km
+      expect(calculateOptimalInterval(500)).toBe(20) // 100-500km
+      expect(calculateOptimalInterval(501)).toBe(50) // 500km以上
+      expect(calculateOptimalInterval(1000)).toBe(50) // 500km以上
     })
   })
 

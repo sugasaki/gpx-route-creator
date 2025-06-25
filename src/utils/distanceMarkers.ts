@@ -9,16 +9,35 @@ export interface DistanceMarker {
 }
 
 /**
+ * ルートの総距離に基づいて適切なマーカー間隔を計算する
+ * @param totalDistanceKm ルートの総距離（km）
+ * @returns 適切なマーカー間隔（km）
+ */
+export function calculateOptimalInterval(totalDistanceKm: number): number {
+  if (totalDistanceKm <= 10) {
+    return 1 // 0-10km: 1kmごと
+  } else if (totalDistanceKm <= 50) {
+    return 5 // 10-50km: 5kmごと
+  } else if (totalDistanceKm <= 100) {
+    return 10 // 50-100km: 10kmごと
+  } else if (totalDistanceKm <= 500) {
+    return 20 // 100-500km: 20kmごと
+  } else {
+    return 50 // 500km以上: 50kmごと
+  }
+}
+
+/**
  * ルート上に指定間隔で距離マーカーを生成する
  * @param routePoints ルートポイントの配列
- * @param intervalKm マーカー間隔（km）
+ * @param intervalKm マーカー間隔（km）- 省略時は自動計算
  * @returns 距離マーカーの配列
  */
 export function generateDistanceMarkers(
   routePoints: RoutePoint[],
-  intervalKm: number = 1
+  intervalKm?: number
 ): DistanceMarker[] {
-  if (routePoints.length < 2 || intervalKm <= 0) {
+  if (routePoints.length < 2) {
     return []
   }
 
@@ -31,8 +50,15 @@ export function generateDistanceMarkers(
   // ルート全体の長さを取得（km単位）
   const totalLength = turf.lineDistance(line, 'kilometers')
   
+  // 間隔が指定されていない場合は、総距離に基づいて自動計算
+  const interval = intervalKm ?? calculateOptimalInterval(totalLength)
+  
+  if (interval <= 0) {
+    return []
+  }
+  
   // 指定間隔でマーカーを生成
-  let currentDistance = intervalKm
+  let currentDistance = interval
   while (currentDistance < totalLength) {
     // 指定距離の位置を計算
     const point = turf.along(line, currentDistance, 'kilometers')
@@ -45,7 +71,7 @@ export function generateDistanceMarkers(
       distance: currentDistance
     })
     
-    currentDistance += intervalKm
+    currentDistance += interval
   }
   
   return markers

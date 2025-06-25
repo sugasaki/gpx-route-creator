@@ -7,7 +7,6 @@ import RouteActions from '@/components/controls/RouteActions'
 import ModeIndicator from '@/components/controls/ModeIndicator'
 import MapStyleSelector from '@/components/controls/MapStyleSelector'
 import RouteColorPicker from '@/components/controls/RouteColorPicker'
-import DistanceMarkerToggle from '@/components/controls/DistanceMarkerToggle'
 
 export default function MapControls() {
   return (
@@ -16,7 +15,6 @@ export default function MapControls() {
       
       {/* Map style selector and color picker - top right */}
       <div className="absolute right-4 top-4 flex gap-2">
-        <DistanceMarkerToggle />
         <RouteColorPicker />
         <MapStyleSelector />
       </div>

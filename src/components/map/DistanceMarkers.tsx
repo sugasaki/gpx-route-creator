@@ -2,23 +2,22 @@ import { useMemo, useCallback, useEffect, useState, useRef } from 'react'
 import { Source, Layer } from 'react-map-gl/maplibre'
 import { useMap } from 'react-map-gl/maplibre'
 import { useRouteStore } from '@/store/routeStore'
-import { useDistanceMarkerStore } from '@/store/distanceMarkerStore'
-import { generateDistanceMarkers, filterMarkersInViewport, formatDistance } from '@/utils/distanceMarkers'
+import { generateDistanceMarkers, filterMarkersInViewport, markersToGeoJSON } from '@/utils/distanceMarkers'
 
 export default function DistanceMarkers() {
   const { current: map } = useMap()
   const { route } = useRouteStore()
-  const { isDistanceMarkersVisible, markerInterval } = useDistanceMarkerStore()
   const [visibleMarkers, setVisibleMarkers] = useState<ReturnType<typeof generateDistanceMarkers>>([])
   const updateTimeoutRef = useRef<number | null>(null)
+  const markerInterval = 1 // 1km固定
   
   // 全マーカーを計算（メモ化）
   const allMarkers = useMemo(() => {
-    if (!isDistanceMarkersVisible || route.points.length < 2) {
+    if (route.points.length < 2) {
       return []
     }
     return generateDistanceMarkers(route.points, markerInterval)
-  }, [route.points, isDistanceMarkersVisible, markerInterval])
+  }, [route.points, markerInterval])
   
   // ビューポートが変更されたときの処理（デバウンス付き）
   const updateVisibleMarkers = useCallback(() => {
@@ -32,7 +31,9 @@ export default function DistanceMarkers() {
       window.clearTimeout(updateTimeoutRef.current)
     }
     
-    // デバウンス処理
+    // デバウンス処理: 地図の移動・ズーム中は高頻度でイベントが発生するため、
+    // パフォーマンス最適化のために100ms間隔で処理を間引く。
+    // これにより、スムーズな地図操作を維持しながら、必要な更新を行う。
     updateTimeoutRef.current = window.setTimeout(() => {
       const bounds = map.getBounds()
       const viewport = {
@@ -42,7 +43,8 @@ export default function DistanceMarkers() {
         west: bounds.getWest()
       }
       
-      // ビューポートを少し拡張して、端の見切れを防ぐ
+      // ビューポートを10%拡張して、画面端でのマーカーの見切れを防ぐ。
+      // ユーザーが地図を素早く動かしても、マーカーが突然現れたり消えたりしない。
       const latRange = viewport.north - viewport.south
       const lngRange = viewport.east - viewport.west
       const expandedViewport = {
@@ -68,13 +70,17 @@ export default function DistanceMarkers() {
     // 初回実行
     updateVisibleMarkers()
     
-    // イベントリスナー登録（move中も更新）
+    // イベントリスナー登録
     map.on('move', handleViewportChange)
     map.on('zoom', handleViewportChange)
+    map.on('moveend', handleViewportChange)
+    map.on('zoomend', handleViewportChange)
     
     return () => {
       map.off('move', handleViewportChange)
       map.off('zoom', handleViewportChange)
+      map.off('moveend', handleViewportChange)
+      map.off('zoomend', handleViewportChange)
       // クリーンアップ時にタイムアウトもクリア
       if (updateTimeoutRef.current) {
         window.clearTimeout(updateTimeoutRef.current)
@@ -82,26 +88,12 @@ export default function DistanceMarkers() {
     }
   }, [map, updateVisibleMarkers])
   
-  if (!isDistanceMarkersVisible || visibleMarkers.length === 0) {
+  if (visibleMarkers.length === 0) {
     return null
   }
   
   // GeoJSONデータを作成
-  const geojson = {
-    type: 'FeatureCollection' as const,
-    features: visibleMarkers.map(marker => ({
-      type: 'Feature' as const,
-      geometry: {
-        type: 'Point' as const,
-        coordinates: [marker.lng, marker.lat]
-      },
-      properties: {
-        id: marker.id,
-        distance: marker.distance,
-        label: formatDistance(marker.distance)
-      }
-    }))
-  }
+  const geojson = markersToGeoJSON(visibleMarkers)
   
   return (
     <Source id="distance-markers" type="geojson" data={geojson}>
@@ -110,10 +102,10 @@ export default function DistanceMarkers() {
         id="distance-markers-circle"
         type="circle"
         paint={{
-          'circle-radius': 16,
+          'circle-radius': 8,
           'circle-color': '#3B82F6', // blue-500
           'circle-stroke-color': '#FFFFFF',
-          'circle-stroke-width': 2
+          'circle-stroke-width': 1
         }}
       />
       {/* 距離ラベル */}
@@ -122,8 +114,7 @@ export default function DistanceMarkers() {
         type="symbol"
         layout={{
           'text-field': '{label}',
-          'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
-          'text-size': 12,
+          'text-size': 10,
           'text-anchor': 'center'
         }}
         paint={{

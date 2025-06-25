@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { generateDistanceMarkers, filterMarkersInViewport, formatDistance } from '../distanceMarkers'
+import { generateDistanceMarkers, filterMarkersInViewport, formatDistance, markersToGeoJSON } from '../distanceMarkers'
 import { RoutePoint } from '@/types'
 
 describe('distanceMarkers', () => {
@@ -126,6 +126,40 @@ describe('distanceMarkers', () => {
       expect(formatDistance(10.6)).toBe('11')
       expect(formatDistance(25.3)).toBe('25')
       expect(formatDistance(100.8)).toBe('101')
+    })
+  })
+
+  describe('markersToGeoJSON', () => {
+    it('マーカー配列をGeoJSON形式に変換する', () => {
+      const markers = [
+        { id: 'marker-1', lat: 35.681236, lng: 139.767125, distance: 1 },
+        { id: 'marker-2', lat: 35.691236, lng: 139.777125, distance: 2 }
+      ]
+      
+      const geojson = markersToGeoJSON(markers)
+      
+      expect(geojson.type).toBe('FeatureCollection')
+      expect(geojson.features).toHaveLength(2)
+      
+      expect(geojson.features[0]).toEqual({
+        type: 'Feature',
+        geometry: {
+          type: 'Point',
+          coordinates: [139.767125, 35.681236]
+        },
+        properties: {
+          id: 'marker-1',
+          distance: 1,
+          label: '1'
+        }
+      })
+    })
+
+    it('空のマーカー配列を処理できる', () => {
+      const geojson = markersToGeoJSON([])
+      
+      expect(geojson.type).toBe('FeatureCollection')
+      expect(geojson.features).toEqual([])
     })
   })
 })

@@ -1,4 +1,4 @@
-import * as turf from '@turf/turf'
+import * as turf from 'turf'
 import { RoutePoint } from '@/types'
 
 export interface DistanceMarker {
@@ -82,5 +82,28 @@ export function formatDistance(distanceKm: number): string {
     return `${distanceKm}`
   } else {
     return `${Math.round(distanceKm)}`
+  }
+}
+
+/**
+ * 距離マーカーをGeoJSON形式に変換する
+ * @param markers 距離マーカーの配列
+ * @returns GeoJSON FeatureCollection
+ */
+export function markersToGeoJSON(markers: DistanceMarker[]) {
+  return {
+    type: 'FeatureCollection' as const,
+    features: markers.map(marker => ({
+      type: 'Feature' as const,
+      geometry: {
+        type: 'Point' as const,
+        coordinates: [marker.lng, marker.lat]
+      },
+      properties: {
+        id: marker.id,
+        distance: marker.distance,
+        label: formatDistance(marker.distance)
+      }
+    }))
   }
 }

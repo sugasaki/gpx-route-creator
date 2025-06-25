@@ -34,7 +34,8 @@ export default function DistanceMarkers() {
         type="symbol"
         layout={{
           'text-field': '{label}',
-          'text-size': 10,
+          'text-size': 12,
+          'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
           'text-anchor': 'center',
           'text-padding': 2,
           'text-allow-overlap': true
@@ -42,7 +43,7 @@ export default function DistanceMarkers() {
         paint={{
           'text-color': '#3B82F6', // blue-500
           'text-halo-color': '#FFFFFF',
-          'text-halo-width': 6,
+          'text-halo-width': 8,
           'text-halo-blur': 0
         }}
       />

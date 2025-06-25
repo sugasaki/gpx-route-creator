@@ -6,6 +6,7 @@ import MapContainer from '@/components/map/MapContainer'
 import RouteLine from '@/components/map/RouteLine'
 import RouteMarkers from '@/components/map/RouteMarkers'
 import WaypointMarkers from '@/components/map/WaypointMarkers'
+import DistanceMarkers from '@/components/map/DistanceMarkers'
 import SelectionOverlay from '@/components/SelectionOverlay'
 import WaypointDialog from '@/components/WaypointDialog'
 
@@ -29,6 +30,7 @@ export default function MapComponent() {
         onMouseLeave={handleMouseLeave}
       >
         <RouteLine />
+        <DistanceMarkers />
         <RouteMarkers />
         <WaypointMarkers />
       </MapContainer>

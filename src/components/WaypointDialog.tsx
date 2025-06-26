@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useUIStore } from '@/store/uiStore'
 import { useRouteStore } from '@/store/routeStore'
 import { WaypointType } from '@/types'
+import { formatDistance } from '@/utils/geo'
 
 interface WaypointFormData {
   name: string
@@ -122,6 +123,12 @@ export default function WaypointDialog() {
           <h2 className="text-xl font-bold mb-4">
             {isEditMode ? 'Waypointを編集' : 'Waypointを追加'}
           </h2>
+
+          {isEditMode && selectedWaypoint?.distanceFromStart !== undefined && (
+            <div className="mb-4 text-gray-600 text-sm">
+              ルート始点からの距離: <span className="font-semibold">{formatDistance(selectedWaypoint.distanceFromStart)}</span>
+            </div>
+          )}
           
           {/* 名前入力 */}
           <div className="mb-4">

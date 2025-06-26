@@ -22,6 +22,7 @@ export interface Waypoint {
   type: WaypointType
   // ルート上の最も近いポイントのインデックス（移動時に使用）
   nearestPointIndex?: number
+  distanceFromStart?: number // ルート始点からの距離 (メートル)
 }
 
 export type EditMode = 'view' | 'create' | 'edit' | 'delete' | 'delete-range' | 'waypoint'

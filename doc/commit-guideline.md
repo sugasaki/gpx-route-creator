@@ -43,4 +43,4 @@
 
 
 ## その他
-署名: 🤖 Generated with [Claude Code](https://claude.ai/code) を含める
+

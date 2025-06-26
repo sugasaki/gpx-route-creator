@@ -12,7 +12,7 @@
 
 ## Pull Request Guidelines
 
-`doc/pullreq-guideline.md`を参照してください
+`doc/pull-request-guidelines.md`を参照してください
 
 ## Commit Message Guidelines  
 - `doc/commit-guideline.md`のルールを守ってコミットを行います。

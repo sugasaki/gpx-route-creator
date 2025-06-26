@@ -43,4 +43,8 @@
 
 
 ## その他
-署名: 🤖 Generated with [Claude Code](https://claude.ai/code) を含める
+- **Signature**:
+  - GeminiからPull Requestを作成する場合:
+    - `🤖 Generated with Gemini` を末尾に含める
+  - Claude CodeからPull Requestを作成する場合:
+    - `🤖 Generated with Claude Code` を末尾に含める

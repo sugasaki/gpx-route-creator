@@ -12,7 +12,13 @@ export function useInitializeWaypointDistances() {
   useEffect(() => {
     // ルートとWaypointが存在する場合
     if (route.points.length >= 2 && waypoints.length > 0) {
-      updateWaypointDistances()
+      // 距離が未計算のWaypointがあるかチェック
+      const hasUninitializedWaypoints = waypoints.some(
+        w => w.distanceFromStart === undefined
+      )
+      if (hasUninitializedWaypoints) {
+        updateWaypointDistances()
+      }
     }
-  }, [route.points.length, waypoints.length]) // ルートやWaypointが変更されたら実行
+  }, [route.points.length, waypoints, updateWaypointDistances]) // Waypointの内容が変更されたら実行
 }

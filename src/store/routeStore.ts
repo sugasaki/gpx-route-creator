@@ -24,6 +24,7 @@ interface RouteState {
   clearRoute: () => void
   calculateDistance: () => void
   updateWaypointDistances: () => void
+  updateWaypointDistancesInternal: (points: RoutePoint[]) => Waypoint[]
 }
 
 const generateId = () => Math.random().toString(36).substr(2, 9)
@@ -42,14 +43,15 @@ export const useRouteStore = create<RouteState>((set, get) => ({
     const newHistory = get().history.slice(0, get().historyIndex + 1)
     newHistory.push(newRoute)
     
+    // Waypointの距離を同時に更新
+    const updatedWaypoints = get().updateWaypointDistancesInternal(newRoute.points)
+    
     set({
       route: newRoute,
       history: newHistory,
-      historyIndex: newHistory.length - 1
+      historyIndex: newHistory.length - 1,
+      waypoints: updatedWaypoints
     })
-    
-    // waypointの距離を更新
-    get().updateWaypointDistances()
   },
   
   insertPoint: (index, point) => {
@@ -61,14 +63,15 @@ export const useRouteStore = create<RouteState>((set, get) => ({
     const newHistory = get().history.slice(0, get().historyIndex + 1)
     newHistory.push(newRoute)
     
+    // Waypointの距離を同時に更新
+    const updatedWaypoints = get().updateWaypointDistancesInternal(newRoute.points)
+    
     set({
       route: newRoute,
       history: newHistory,
-      historyIndex: newHistory.length - 1
+      historyIndex: newHistory.length - 1,
+      waypoints: updatedWaypoints
     })
-    
-    // waypointの距離を更新
-    get().updateWaypointDistances()
   },
   
   updatePoint: (id, updates) => {
@@ -80,14 +83,15 @@ export const useRouteStore = create<RouteState>((set, get) => ({
     const newHistory = get().history.slice(0, get().historyIndex + 1)
     newHistory.push(newRoute)
     
+    // Waypointの距離を同時に更新
+    const updatedWaypoints = get().updateWaypointDistancesInternal(newRoute.points)
+    
     set({
       route: newRoute,
       history: newHistory,
-      historyIndex: newHistory.length - 1
+      historyIndex: newHistory.length - 1,
+      waypoints: updatedWaypoints
     })
-    
-    // waypointの距離を更新
-    get().updateWaypointDistances()
   },
   
   deletePoint: (id) => {
@@ -97,14 +101,15 @@ export const useRouteStore = create<RouteState>((set, get) => ({
     const newHistory = get().history.slice(0, get().historyIndex + 1)
     newHistory.push(newRoute)
     
+    // Waypointの距離を同時に更新
+    const updatedWaypoints = get().updateWaypointDistancesInternal(newRoute.points)
+    
     set({
       route: newRoute,
       history: newHistory,
-      historyIndex: newHistory.length - 1
+      historyIndex: newHistory.length - 1,
+      waypoints: updatedWaypoints
     })
-    
-    // waypointの距離を更新
-    get().updateWaypointDistances()
   },
   
   deleteMultiplePoints: (ids) => {
@@ -114,14 +119,15 @@ export const useRouteStore = create<RouteState>((set, get) => ({
     const newHistory = get().history.slice(0, get().historyIndex + 1)
     newHistory.push(newRoute)
     
+    // Waypointの距離を同時に更新
+    const updatedWaypoints = get().updateWaypointDistancesInternal(newRoute.points)
+    
     set({
       route: newRoute,
       history: newHistory,
-      historyIndex: newHistory.length - 1
+      historyIndex: newHistory.length - 1,
+      waypoints: updatedWaypoints
     })
-    
-    // waypointの距離を更新
-    get().updateWaypointDistances()
   },
   
   movePoint: (id, lat, lng) => {
@@ -133,8 +139,12 @@ export const useRouteStore = create<RouteState>((set, get) => ({
       p.id === id ? { ...p, lat, lng } : p
     )
     const newRoute = { points: newPoints, distance: calculateDistance(newPoints) }
+    const updatedWaypoints = get().updateWaypointDistancesInternal(newPoints)
     
-    set({ route: newRoute })
+    set({ 
+      route: newRoute,
+      waypoints: updatedWaypoints
+    })
   },
   
   saveCurrentStateToHistory: () => {
@@ -150,9 +160,13 @@ export const useRouteStore = create<RouteState>((set, get) => ({
   undo: () => {
     const { historyIndex, history } = get()
     if (historyIndex > 0) {
+      const newRoute = history[historyIndex - 1]
+      const updatedWaypoints = get().updateWaypointDistancesInternal(newRoute.points)
+      
       set({
-        route: history[historyIndex - 1],
-        historyIndex: historyIndex - 1
+        route: newRoute,
+        historyIndex: historyIndex - 1,
+        waypoints: updatedWaypoints
       })
     }
   },
@@ -160,9 +174,13 @@ export const useRouteStore = create<RouteState>((set, get) => ({
   redo: () => {
     const { historyIndex, history } = get()
     if (historyIndex < history.length - 1) {
+      const newRoute = history[historyIndex + 1]
+      const updatedWaypoints = get().updateWaypointDistancesInternal(newRoute.points)
+      
       set({
-        route: history[historyIndex + 1],
-        historyIndex: historyIndex + 1
+        route: newRoute,
+        historyIndex: historyIndex + 1,
+        waypoints: updatedWaypoints
       })
     }
   },
@@ -231,31 +249,31 @@ export const useRouteStore = create<RouteState>((set, get) => ({
   
   updateWaypointDistances: () => {
     const state = get()
+    const updatedWaypoints = get().updateWaypointDistancesInternal(state.route.points)
+    set({ waypoints: updatedWaypoints })
+  },
+  
+  updateWaypointDistancesInternal: (points: RoutePoint[]) => {
+    const state = get()
     
-    const updatedWaypoints = state.waypoints.map(waypoint => {
-      
+    return state.waypoints.map(waypoint => {
       // nearestPointIndexがない場合は、最も近いポイントを探す
       let nearestIndex = waypoint.nearestPointIndex
-      if (nearestIndex === undefined && state.route.points.length >= 2) {
+      if (nearestIndex === undefined && points.length >= 2) {
         // ルート上の最も近い点を見つける
         const closestPoint = findClosestPointOnRoute(
           waypoint.lat,
           waypoint.lng,
-          state.route.points
+          points
         )
         nearestIndex = closestPoint.nearestPointIndex
-        
       }
       
-      if (nearestIndex !== undefined) {
-        const distanceFromStart = calculateDistanceToIndex(state.route.points, nearestIndex)
-        
+      if (nearestIndex !== undefined && points.length >= 2) {
+        const distanceFromStart = calculateDistanceToIndex(points, nearestIndex)
         return { ...waypoint, nearestPointIndex: nearestIndex, distanceFromStart }
       }
       return waypoint
     })
-    
-    
-    set({ waypoints: updatedWaypoints })
   }
 }))

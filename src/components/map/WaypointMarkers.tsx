@@ -93,6 +93,9 @@ function WaypointMarker({ waypoint }: { waypoint: Waypoint }) {
             {waypoint.description && (
               <p className="text-sm text-gray-600 mt-1">{waypoint.description}</p>
             )}
+            {waypoint.distanceFromStart !== undefined && (
+              <p className="text-xs text-gray-500 mt-1">始点から: {waypoint.distanceFromStart.toFixed(2)}km</p>
+            )}
             {waypoint.elevation && (
               <p className="text-xs text-gray-500 mt-1">標高: {waypoint.elevation.toFixed(1)}m</p>
             )}

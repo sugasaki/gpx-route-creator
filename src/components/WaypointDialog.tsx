@@ -79,7 +79,8 @@ export default function WaypointDialog() {
         lng: pendingWaypoint.lng,
         name: formData.name,
         description: formData.description || undefined,
-        type: formData.type
+        type: formData.type,
+        nearestPointIndex: pendingWaypoint.nearestPointIndex
       })
     }
     
@@ -151,6 +152,20 @@ export default function WaypointDialog() {
               rows={3}
             />
           </div>
+          
+          {/* ルート始点からの距離 */}
+          {(selectedWaypoint?.distanceFromStart !== undefined || pendingWaypoint) && (
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                ルート始点からの距離
+              </label>
+              <div className="px-3 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-700">
+                {selectedWaypoint?.distanceFromStart !== undefined 
+                  ? `${selectedWaypoint.distanceFromStart.toFixed(2)} km`
+                  : '計算中...'}
+              </div>
+            </div>
+          )}
           
           {/* タイプ選択 */}
           <div className="mb-6">

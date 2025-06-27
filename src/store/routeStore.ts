@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { RoutePoint, Route, Waypoint } from '@/types'
-import { calculateDistance } from '@/utils/geo'
+import { calculateDistance, calculateDistanceToWaypoint, calculateAllWaypointDistances } from '@/utils/geo'
 
 interface RouteState {
   route: Route
@@ -23,6 +23,7 @@ interface RouteState {
   redo: () => void
   clearRoute: () => void
   calculateDistance: () => void
+  recalculateWaypointDistances: () => void
 }
 
 const generateId = () => Math.random().toString(36).substr(2, 9)
@@ -46,6 +47,7 @@ export const useRouteStore = create<RouteState>((set, get) => ({
       history: newHistory,
       historyIndex: newHistory.length - 1
     })
+    get().recalculateWaypointDistances()
   },
   
   insertPoint: (index, point) => {
@@ -62,6 +64,7 @@ export const useRouteStore = create<RouteState>((set, get) => ({
       history: newHistory,
       historyIndex: newHistory.length - 1
     })
+    get().recalculateWaypointDistances()
   },
   
   updatePoint: (id, updates) => {
@@ -78,6 +81,7 @@ export const useRouteStore = create<RouteState>((set, get) => ({
       history: newHistory,
       historyIndex: newHistory.length - 1
     })
+    get().recalculateWaypointDistances()
   },
   
   deletePoint: (id) => {
@@ -92,6 +96,7 @@ export const useRouteStore = create<RouteState>((set, get) => ({
       history: newHistory,
       historyIndex: newHistory.length - 1
     })
+    get().recalculateWaypointDistances()
   },
   
   deleteMultiplePoints: (ids) => {
@@ -106,6 +111,7 @@ export const useRouteStore = create<RouteState>((set, get) => ({
       history: newHistory,
       historyIndex: newHistory.length - 1
     })
+    get().recalculateWaypointDistances()
   },
   
   movePoint: (id, lat, lng) => {
@@ -119,6 +125,7 @@ export const useRouteStore = create<RouteState>((set, get) => ({
     const newRoute = { points: newPoints, distance: calculateDistance(newPoints) }
     
     set({ route: newRoute })
+    get().recalculateWaypointDistances()
   },
   
   saveCurrentStateToHistory: () => {
@@ -138,6 +145,7 @@ export const useRouteStore = create<RouteState>((set, get) => ({
         route: history[historyIndex - 1],
         historyIndex: historyIndex - 1
       })
+      get().recalculateWaypointDistances()
     }
   },
   
@@ -148,6 +156,7 @@ export const useRouteStore = create<RouteState>((set, get) => ({
         route: history[historyIndex + 1],
         historyIndex: historyIndex + 1
       })
+      get().recalculateWaypointDistances()
     }
   },
   
@@ -169,7 +178,14 @@ export const useRouteStore = create<RouteState>((set, get) => ({
   },
   
   addWaypoint: (waypoint) => {
-    const newWaypoint: Waypoint = { ...waypoint, id: generateId() }
+    const newWaypoint: Waypoint = { 
+      ...waypoint, 
+      id: generateId(),
+      distanceFromStart: calculateDistanceToWaypoint(
+        waypoint as Waypoint,
+        get().route.points
+      )
+    }
     set(state => ({
       waypoints: [...state.waypoints, newWaypoint]
     }))
@@ -190,10 +206,27 @@ export const useRouteStore = create<RouteState>((set, get) => ({
   },
   
   moveWaypointOnRoute: (id, nearestPointIndex) => {
+    set(state => {
+      const updatedWaypoints = state.waypoints.map(w => {
+        if (w.id === id) {
+          const updatedWaypoint = { ...w, nearestPointIndex }
+          return {
+            ...updatedWaypoint,
+            distanceFromStart: calculateDistanceToWaypoint(
+              updatedWaypoint,
+              get().route.points
+            )
+          }
+        }
+        return w
+      })
+      return { waypoints: updatedWaypoints }
+    })
+  },
+  
+  recalculateWaypointDistances: () => {
     set(state => ({
-      waypoints: state.waypoints.map(w => 
-        w.id === id ? { ...w, nearestPointIndex } : w
-      )
+      waypoints: calculateAllWaypointDistances(state.waypoints, state.route.points)
     }))
   }
 }))

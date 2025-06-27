@@ -1,5 +1,5 @@
 import * as turf from 'turf'
-import { RoutePoint } from '@/types'
+import { RoutePoint, Waypoint } from '@/types'
 
 /**
  * Calculate distance from point to line segment (for backward compatibility)
@@ -115,4 +115,67 @@ export function findClosestPointOnRoute(
     lng: snappedCoords[0],
     nearestPointIndex
   }
+}
+
+/**
+ * Calculate the distance from the route start to a waypoint along the route
+ * Returns distance in kilometers
+ */
+export function calculateDistanceToWaypoint(
+  waypoint: Waypoint,
+  routePoints: RoutePoint[]
+): number {
+  if (routePoints.length < 2 || waypoint.nearestPointIndex === undefined) {
+    return 0
+  }
+
+  // Find the exact position of the waypoint on the route
+  const waypointPoint = turf.point([waypoint.lng, waypoint.lat])
+  const routeLine = turf.lineString(
+    routePoints.map(p => [p.lng, p.lat])
+  )
+  
+  // Get the snapped point on the line (exact position on route)
+  const snappedPoint = turf.pointOnLine(routeLine, waypointPoint)
+  
+  // Calculate distance along the route to this point
+  // We need to build the route up to the waypoint's position
+  let accumulatedDistance = 0
+  
+  // Add distances for complete segments before the waypoint
+  for (let i = 0; i < waypoint.nearestPointIndex; i++) {
+    const segmentLine = turf.lineString([
+      [routePoints[i].lng, routePoints[i].lat],
+      [routePoints[i + 1].lng, routePoints[i + 1].lat]
+    ])
+    accumulatedDistance += turf.lineDistance(segmentLine, 'kilometers')
+  }
+  
+  // Add partial distance on the segment containing the waypoint
+  if (waypoint.nearestPointIndex < routePoints.length - 1) {
+    const segmentStart = turf.point([
+      routePoints[waypoint.nearestPointIndex].lng,
+      routePoints[waypoint.nearestPointIndex].lat
+    ])
+    const partialSegment = turf.lineString([
+      segmentStart.geometry.coordinates,
+      snappedPoint.geometry.coordinates
+    ])
+    accumulatedDistance += turf.lineDistance(partialSegment, 'kilometers')
+  }
+  
+  return accumulatedDistance
+}
+
+/**
+ * Calculate distances for all waypoints from the route start
+ */
+export function calculateAllWaypointDistances(
+  waypoints: Waypoint[],
+  routePoints: RoutePoint[]
+): Waypoint[] {
+  return waypoints.map(waypoint => ({
+    ...waypoint,
+    distanceFromStart: calculateDistanceToWaypoint(waypoint, routePoints)
+  }))
 }

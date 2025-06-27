@@ -115,6 +115,14 @@ export function findClosestPointOnRoute(
     }
   }
   
+  console.log('findClosestPointOnRoute:', {
+    clickLat,
+    clickLng,
+    snappedLat: snappedCoords[1],
+    snappedLng: snappedCoords[0],
+    nearestPointIndex,
+    minDistance
+  })
   
   return {
     lat: snappedCoords[1],
@@ -133,15 +141,17 @@ export function calculateDistanceToIndex(
   points: RoutePoint[],
   targetIndex: number
 ): number {
+  console.log('calculateDistanceToIndex:', {
+    pointsLength: points.length,
+    targetIndex: targetIndex
+  })
   
   if (points.length < 2 || targetIndex < 0) {
-    
     return 0
   }
   
   // インデックス0の場合も距離は0
   if (targetIndex === 0) {
-    
     return 0
   }
   
@@ -154,6 +164,13 @@ export function calculateDistanceToIndex(
   // Convert to meters then to kilometers
   const distanceMeters = calculateDistance(subRoute)
   const distanceKm = distanceMeters / 1000
+  
+  console.log('calculateDistanceToIndex result:', {
+    limitedIndex,
+    subRouteLength: subRoute.length,
+    distanceMeters,
+    distanceKm
+  })
   
   return distanceKm
 }

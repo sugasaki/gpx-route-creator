@@ -233,6 +233,11 @@ export const useRouteStore = create<RouteState>((set, get) => ({
           if (updates.nearestPointIndex !== undefined && state.route.points.length >= 2) {
             const distanceFromStart = calculateDistanceToIndex(state.route.points, updates.nearestPointIndex)
             updatedWaypoint.distanceFromStart = distanceFromStart
+            console.log('Updated waypoint distance:', {
+              waypointId: id,
+              nearestPointIndex: updates.nearestPointIndex,
+              distanceFromStart: distanceFromStart
+            })
           }
           
           return updatedWaypoint

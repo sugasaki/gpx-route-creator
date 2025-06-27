@@ -92,6 +92,8 @@ export function findClosestPointOnRoute(
   const snappedCoords = snapped.geometry.coordinates
   
   // Check which segment contains the snapped point
+  const segmentDistances: Array<{index: number, distance: number}> = []
+  
   for (let i = 0; i < points.length - 1; i++) {
     const segment = turf.lineString([
       [points[i].lng, points[i].lat],
@@ -106,14 +108,16 @@ export function findClosestPointOnRoute(
       'degrees'
     )
     
+    segmentDistances.push({index: i, distance: distanceToSegment})
     
     // 最小距離のセグメントを記録
     if (distanceToSegment < minDistance) {
       minDistance = distanceToSegment
       nearestPointIndex = i
-      
     }
   }
+  
+  console.log('Segment distances:', segmentDistances)
   
   console.log('findClosestPointOnRoute:', {
     clickLat,

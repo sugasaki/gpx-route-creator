@@ -55,6 +55,14 @@ function WaypointMarker({ waypoint }: { waypoint: Waypoint }) {
   const selectedWaypointId = useUIStore((state) => state.selectedWaypointId)
   const [showPopup, setShowPopup] = useState(false)
   
+  // デバッグ用
+  console.log('Rendering waypoint:', {
+    id: waypoint.id,
+    name: waypoint.name,
+    nearestPointIndex: waypoint.nearestPointIndex,
+    distanceFromStart: waypoint.distanceFromStart
+  })
+  
   const {
     isDragging,
     canDrag,

@@ -73,6 +73,7 @@ export function findClosestPointOnRoute(
   clickLng: number,
   points: RoutePoint[]
 ): { lat: number; lng: number; nearestPointIndex: number } {
+  
   if (points.length < 2) {
     return { lat: clickLat, lng: clickLng, nearestPointIndex: 0 }
   }
@@ -87,9 +88,12 @@ export function findClosestPointOnRoute(
   
   // Find which segment the snapped point is on
   let nearestPointIndex = 0
+  let minDistance = Infinity
   const snappedCoords = snapped.geometry.coordinates
   
   // Check which segment contains the snapped point
+  const segmentDistances: Array<{index: number, distance: number}> = []
+  
   for (let i = 0; i < points.length - 1; i++) {
     const segment = turf.lineString([
       [points[i].lng, points[i].lat],
@@ -104,15 +108,73 @@ export function findClosestPointOnRoute(
       'degrees'
     )
     
-    if (distanceToSegment < 0.0000001) { // Very small threshold for floating point comparison
+    segmentDistances.push({index: i, distance: distanceToSegment})
+    
+    // 最小距離のセグメントを記録
+    if (distanceToSegment < minDistance) {
+      minDistance = distanceToSegment
       nearestPointIndex = i
-      break
     }
   }
+  
+  console.log('Segment distances:', segmentDistances)
+  
+  console.log('findClosestPointOnRoute:', {
+    clickLat,
+    clickLng,
+    snappedLat: snappedCoords[1],
+    snappedLng: snappedCoords[0],
+    nearestPointIndex,
+    minDistance
+  })
   
   return {
     lat: snappedCoords[1],
     lng: snappedCoords[0],
     nearestPointIndex
   }
+}
+
+/**
+ * Calculate distance from route start to a specific point index
+ * @param points Route points array
+ * @param targetIndex Index to calculate distance to
+ * @returns Distance in kilometers
+ */
+export function calculateDistanceToIndex(
+  points: RoutePoint[],
+  targetIndex: number
+): number {
+  console.log('calculateDistanceToIndex:', {
+    pointsLength: points.length,
+    targetIndex: targetIndex
+  })
+  
+  if (points.length < 2 || targetIndex < 0) {
+    return 0
+  }
+  
+  // インデックス0の場合も距離は0
+  if (targetIndex === 0) {
+    return 0
+  }
+  
+  // Limit targetIndex to valid range
+  const limitedIndex = Math.min(targetIndex, points.length - 1)
+  
+  // Create sub-route from start to target index
+  const subRoute = points.slice(0, limitedIndex + 1)
+  
+  // Convert to meters then to kilometers
+  const distanceMeters = calculateDistance(subRoute)
+  const distanceKm = distanceMeters / 1000
+  
+  console.log('calculateDistanceToIndex result:', {
+    limitedIndex,
+    subRouteLength: subRoute.length,
+    distanceMeters,
+    distanceKm
+  })
+  
+  return distanceKm
 }

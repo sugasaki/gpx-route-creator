@@ -33,7 +33,8 @@ export function useWaypointHandlers({ mapRef }: UseWaypointHandlersProps) {
       // 計算された点にWaypointを配置
       setPendingWaypoint({
         lat: closestPoint.lat,
-        lng: closestPoint.lng
+        lng: closestPoint.lng,
+        nearestPointIndex: closestPoint.nearestPointIndex
       })
       setWaypointDialogOpen(true)
     }

@@ -55,6 +55,14 @@ function WaypointMarker({ waypoint }: { waypoint: Waypoint }) {
   const selectedWaypointId = useUIStore((state) => state.selectedWaypointId)
   const [showPopup, setShowPopup] = useState(false)
   
+  // デバッグ用
+  console.log('Rendering waypoint:', {
+    id: waypoint.id,
+    name: waypoint.name,
+    nearestPointIndex: waypoint.nearestPointIndex,
+    distanceFromStart: waypoint.distanceFromStart
+  })
+  
   const {
     isDragging,
     canDrag,
@@ -95,6 +103,9 @@ function WaypointMarker({ waypoint }: { waypoint: Waypoint }) {
             )}
             {waypoint.elevation && (
               <p className="text-xs text-gray-500 mt-1">標高: {waypoint.elevation.toFixed(1)}m</p>
+            )}
+            {waypoint.distanceFromStart !== undefined && (
+              <p className="text-xs text-gray-500 mt-1">開始地点から: {waypoint.distanceFromStart.toFixed(1)}km</p>
             )}
           </div>
         </Popup>

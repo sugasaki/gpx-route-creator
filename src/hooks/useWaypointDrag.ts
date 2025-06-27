@@ -24,6 +24,16 @@ export function useWaypointDrag({ waypoint }: UseWaypointDragProps) {
   const handleDrag = useCallback((e: any) => {
     const { lngLat } = e
     
+    // ルートが存在しない場合は、自由に移動
+    if (route.points.length < 2) {
+      updateWaypoint(waypoint.id, {
+        lat: lngLat.lat,
+        lng: lngLat.lng,
+        nearestPointIndex: undefined
+      })
+      return
+    }
+    
     // ルート上の最も近い点を計算
     const closestPoint = findClosestPointOnRoute(
       lngLat.lat,

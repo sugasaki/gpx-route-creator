@@ -10,7 +10,7 @@ interface UIState {
   selectedWaypointId: string | null
   hoveredWaypointId: string | null
   waypointDialogOpen: boolean
-  pendingWaypoint: { lat: number; lng: number } | null
+  pendingWaypoint: { lat: number; lng: number; nearestPointIndex?: number } | null
   selectionBox: { start: { x: number; y: number }; end: { x: number; y: number } } | null
   mapStyle: MapStyleId
   setEditMode: (mode: EditMode) => void
@@ -19,7 +19,7 @@ interface UIState {
   setSelectedWaypoint: (id: string | null) => void
   setHoveredWaypoint: (id: string | null) => void
   setWaypointDialogOpen: (open: boolean) => void
-  setPendingWaypoint: (waypoint: { lat: number; lng: number } | null) => void
+  setPendingWaypoint: (waypoint: { lat: number; lng: number; nearestPointIndex?: number } | null) => void
   setSelectionBox: (box: { start: { x: number; y: number }; end: { x: number; y: number } } | null) => void
   setMapStyle: (style: MapStyleId) => void
 }

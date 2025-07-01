@@ -138,9 +138,21 @@ export default function WaypointDialog() {
       {/* ダイアログ */}
       <div className="relative bg-white w-full sm:max-w-md rounded-t-2xl sm:rounded-2xl shadow-xl">
         <form onSubmit={handleSubmit} className="p-6">
-          <h2 className="text-xl font-bold mb-4">
-            {isEditMode ? 'Waypointを編集' : 'Waypointを追加'}
-          </h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-bold">
+              {isEditMode ? 'Waypointを編集' : 'Waypointを追加'}
+            </h2>
+            {/* 距離表示 */}
+            {(selectedWaypoint?.distanceFromStart !== undefined || pendingWaypointDistance !== undefined) && (
+              <span className="text-sm text-blue-600 font-medium">
+                始点から: {selectedWaypoint?.distanceFromStart !== undefined 
+                  ? `${selectedWaypoint.distanceFromStart.toFixed(2)}km`
+                  : pendingWaypointDistance !== undefined
+                  ? `${pendingWaypointDistance.toFixed(2)}km`
+                  : '計算中...'}
+              </span>
+            )}
+          </div>
           
           {/* 名前入力 */}
           <div className="mb-4">
@@ -170,22 +182,6 @@ export default function WaypointDialog() {
               rows={3}
             />
           </div>
-          
-          {/* ルート始点からの距離 */}
-          {(selectedWaypoint?.distanceFromStart !== undefined || pendingWaypoint) && (
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                ルート始点からの距離
-              </label>
-              <div className="px-3 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-700">
-                {selectedWaypoint?.distanceFromStart !== undefined 
-                  ? `${selectedWaypoint.distanceFromStart.toFixed(2)} km`
-                  : pendingWaypointDistance !== undefined
-                  ? `${pendingWaypointDistance.toFixed(2)} km`
-                  : '計算中...'}
-              </div>
-            </div>
-          )}
           
           {/* タイプ選択 */}
           <div className="mb-6">

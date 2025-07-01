@@ -144,7 +144,7 @@ export default function WaypointDialog() {
             </h2>
             {/* 距離表示 */}
             {(selectedWaypoint?.distanceFromStart !== undefined || pendingWaypointDistance !== undefined) && (
-              <span className="text-sm text-blue-600 font-medium">
+              <span className="text-base text-blue-600 font-semibold">
                 始点から: {selectedWaypoint?.distanceFromStart !== undefined 
                   ? `${selectedWaypoint.distanceFromStart.toFixed(2)}km`
                   : pendingWaypointDistance !== undefined

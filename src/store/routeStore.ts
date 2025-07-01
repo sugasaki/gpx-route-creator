@@ -1,11 +1,7 @@
 import { create } from 'zustand'
 import { RoutePoint, Route, Waypoint } from '@/types'
 import { calculateDistance, calculateDistanceToWaypoint, calculateAllWaypointDistances } from '@/utils/geo'
-
-interface HistoryState {
-  route: Route
-  waypoints: Waypoint[]
-}
+import { RouteHistoryManager, type HistoryState } from '@/domain/RouteHistoryManager'
 
 interface RouteState {
   route: Route
@@ -44,13 +40,16 @@ export const useRouteStore = create<RouteState>((set, get) => ({
     const newPoints = [...get().route.points, newPoint]
     const newRoute = { points: newPoints, distance: calculateDistance(newPoints) }
     
-    const newHistory = get().history.slice(0, get().historyIndex + 1)
-    newHistory.push({ route: newRoute, waypoints: get().waypoints })
+    const historyResult = RouteHistoryManager.addToHistory(
+      get().history,
+      get().historyIndex,
+      RouteHistoryManager.createSnapshot(newRoute, get().waypoints)
+    )
     
     set({
       route: newRoute,
-      history: newHistory,
-      historyIndex: newHistory.length - 1
+      history: historyResult.history,
+      historyIndex: historyResult.newIndex
     })
     get().recalculateWaypointDistances()
   },
@@ -61,13 +60,16 @@ export const useRouteStore = create<RouteState>((set, get) => ({
     newPoints.splice(index, 0, newPoint)
     const newRoute = { points: newPoints, distance: calculateDistance(newPoints) }
     
-    const newHistory = get().history.slice(0, get().historyIndex + 1)
-    newHistory.push({ route: newRoute, waypoints: get().waypoints })
+    const historyResult = RouteHistoryManager.addToHistory(
+      get().history,
+      get().historyIndex,
+      RouteHistoryManager.createSnapshot(newRoute, get().waypoints)
+    )
     
     set({
       route: newRoute,
-      history: newHistory,
-      historyIndex: newHistory.length - 1
+      history: historyResult.history,
+      historyIndex: historyResult.newIndex
     })
     get().recalculateWaypointDistances()
   },
@@ -78,13 +80,16 @@ export const useRouteStore = create<RouteState>((set, get) => ({
     )
     const newRoute = { points: newPoints, distance: calculateDistance(newPoints) }
     
-    const newHistory = get().history.slice(0, get().historyIndex + 1)
-    newHistory.push({ route: newRoute, waypoints: get().waypoints })
+    const historyResult = RouteHistoryManager.addToHistory(
+      get().history,
+      get().historyIndex,
+      RouteHistoryManager.createSnapshot(newRoute, get().waypoints)
+    )
     
     set({
       route: newRoute,
-      history: newHistory,
-      historyIndex: newHistory.length - 1
+      history: historyResult.history,
+      historyIndex: historyResult.newIndex
     })
     get().recalculateWaypointDistances()
   },
@@ -93,13 +98,16 @@ export const useRouteStore = create<RouteState>((set, get) => ({
     const newPoints = get().route.points.filter(p => p.id !== id)
     const newRoute = { points: newPoints, distance: calculateDistance(newPoints) }
     
-    const newHistory = get().history.slice(0, get().historyIndex + 1)
-    newHistory.push({ route: newRoute, waypoints: get().waypoints })
+    const historyResult = RouteHistoryManager.addToHistory(
+      get().history,
+      get().historyIndex,
+      RouteHistoryManager.createSnapshot(newRoute, get().waypoints)
+    )
     
     set({
       route: newRoute,
-      history: newHistory,
-      historyIndex: newHistory.length - 1
+      history: historyResult.history,
+      historyIndex: historyResult.newIndex
     })
     get().recalculateWaypointDistances()
   },
@@ -108,13 +116,16 @@ export const useRouteStore = create<RouteState>((set, get) => ({
     const newPoints = get().route.points.filter(p => !ids.includes(p.id))
     const newRoute = { points: newPoints, distance: calculateDistance(newPoints) }
     
-    const newHistory = get().history.slice(0, get().historyIndex + 1)
-    newHistory.push({ route: newRoute, waypoints: get().waypoints })
+    const historyResult = RouteHistoryManager.addToHistory(
+      get().history,
+      get().historyIndex,
+      RouteHistoryManager.createSnapshot(newRoute, get().waypoints)
+    )
     
     set({
       route: newRoute,
-      history: newHistory,
-      historyIndex: newHistory.length - 1
+      history: historyResult.history,
+      historyIndex: historyResult.newIndex
     })
     get().recalculateWaypointDistances()
   },
@@ -134,12 +145,15 @@ export const useRouteStore = create<RouteState>((set, get) => ({
   },
   
   saveCurrentStateToHistory: () => {
-    const newHistory = get().history.slice(0, get().historyIndex + 1)
-    newHistory.push({ route: get().route, waypoints: get().waypoints })
+    const historyResult = RouteHistoryManager.addToHistory(
+      get().history,
+      get().historyIndex,
+      RouteHistoryManager.createSnapshot(get().route, get().waypoints)
+    )
     
     set({
-      history: newHistory,
-      historyIndex: newHistory.length - 1
+      history: historyResult.history,
+      historyIndex: historyResult.newIndex
     })
   },
   
@@ -198,13 +212,16 @@ export const useRouteStore = create<RouteState>((set, get) => ({
     }
     const newWaypoints = [...get().waypoints, newWaypoint]
     
-    const newHistory = get().history.slice(0, get().historyIndex + 1)
-    newHistory.push({ route: get().route, waypoints: newWaypoints })
+    const historyResult = RouteHistoryManager.addToHistory(
+      get().history,
+      get().historyIndex,
+      RouteHistoryManager.createSnapshot(get().route, newWaypoints)
+    )
     
     set({
       waypoints: newWaypoints,
-      history: newHistory,
-      historyIndex: newHistory.length - 1
+      history: historyResult.history,
+      historyIndex: historyResult.newIndex
     })
   },
   
@@ -224,26 +241,32 @@ export const useRouteStore = create<RouteState>((set, get) => ({
       return w
     })
     
-    const newHistory = get().history.slice(0, get().historyIndex + 1)
-    newHistory.push({ route: get().route, waypoints: updatedWaypoints })
+    const historyResult = RouteHistoryManager.addToHistory(
+      get().history,
+      get().historyIndex,
+      RouteHistoryManager.createSnapshot(get().route, updatedWaypoints)
+    )
     
     set({
       waypoints: updatedWaypoints,
-      history: newHistory,
-      historyIndex: newHistory.length - 1
+      history: historyResult.history,
+      historyIndex: historyResult.newIndex
     })
   },
   
   deleteWaypoint: (id) => {
     const newWaypoints = get().waypoints.filter(w => w.id !== id)
     
-    const newHistory = get().history.slice(0, get().historyIndex + 1)
-    newHistory.push({ route: get().route, waypoints: newWaypoints })
+    const historyResult = RouteHistoryManager.addToHistory(
+      get().history,
+      get().historyIndex,
+      RouteHistoryManager.createSnapshot(get().route, newWaypoints)
+    )
     
     set({
       waypoints: newWaypoints,
-      history: newHistory,
-      historyIndex: newHistory.length - 1
+      history: historyResult.history,
+      historyIndex: historyResult.newIndex
     })
   },
   
@@ -262,13 +285,16 @@ export const useRouteStore = create<RouteState>((set, get) => ({
       return w
     })
     
-    const newHistory = get().history.slice(0, get().historyIndex + 1)
-    newHistory.push({ route: get().route, waypoints: updatedWaypoints })
+    const historyResult = RouteHistoryManager.addToHistory(
+      get().history,
+      get().historyIndex,
+      RouteHistoryManager.createSnapshot(get().route, updatedWaypoints)
+    )
     
     set({
       waypoints: updatedWaypoints,
-      history: newHistory,
-      historyIndex: newHistory.length - 1
+      history: historyResult.history,
+      historyIndex: historyResult.newIndex
     })
   },
   

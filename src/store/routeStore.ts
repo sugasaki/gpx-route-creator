@@ -192,11 +192,23 @@ export const useRouteStore = create<RouteState>((set, get) => ({
   },
   
   updateWaypoint: (id, updates) => {
-    set(state => ({
-      waypoints: state.waypoints.map(w => 
-        w.id === id ? { ...w, ...updates } : w
-      )
-    }))
+    set(state => {
+      const updatedWaypoints = state.waypoints.map(w => {
+        if (w.id === id) {
+          const updatedWaypoint = { ...w, ...updates }
+          // nearestPointIndexが更新された場合、距離を再計算
+          if (updates.nearestPointIndex !== undefined || updates.lat !== undefined || updates.lng !== undefined) {
+            updatedWaypoint.distanceFromStart = calculateDistanceToWaypoint(
+              updatedWaypoint,
+              get().route.points
+            )
+          }
+          return updatedWaypoint
+        }
+        return w
+      })
+      return { waypoints: updatedWaypoints }
+    })
   },
   
   deleteWaypoint: (id) => {

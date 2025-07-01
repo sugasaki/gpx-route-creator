@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { useUIStore } from '@/store/uiStore'
 import { useRouteStore } from '@/store/routeStore'
 import { WaypointType } from '@/types'
+import { calculateDistanceToWaypoint } from '@/utils/geo'
 
 interface WaypointFormData {
   name: string
@@ -27,6 +28,7 @@ export default function WaypointDialog() {
   const setSelectedWaypoint = useUIStore((state) => state.setSelectedWaypoint)
   
   const waypoints = useRouteStore((state) => state.waypoints)
+  const route = useRouteStore((state) => state.route)
   const addWaypoint = useRouteStore((state) => state.addWaypoint)
   const updateWaypoint = useRouteStore((state) => state.updateWaypoint)
   const deleteWaypoint = useRouteStore((state) => state.deleteWaypoint)
@@ -40,6 +42,22 @@ export default function WaypointDialog() {
   // 選択されたWaypointがある場合は編集モード
   const isEditMode = !!selectedWaypointId
   const selectedWaypoint = waypoints.find(w => w.id === selectedWaypointId)
+  
+  // 新規追加時の距離を計算
+  const pendingWaypointDistance = useMemo(() => {
+    if (!pendingWaypoint || pendingWaypoint.nearestPointIndex === undefined) return undefined
+    
+    const tempWaypoint = {
+      id: 'temp',
+      lat: pendingWaypoint.lat,
+      lng: pendingWaypoint.lng,
+      name: '',
+      type: 'pin' as WaypointType,
+      nearestPointIndex: pendingWaypoint.nearestPointIndex
+    }
+    
+    return calculateDistanceToWaypoint(tempWaypoint, route.points)
+  }, [pendingWaypoint, route.points])
   
   useEffect(() => {
     if (isEditMode && selectedWaypoint) {
@@ -162,6 +180,8 @@ export default function WaypointDialog() {
               <div className="px-3 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-700">
                 {selectedWaypoint?.distanceFromStart !== undefined 
                   ? `${selectedWaypoint.distanceFromStart.toFixed(2)} km`
+                  : pendingWaypointDistance !== undefined
+                  ? `${pendingWaypointDistance.toFixed(2)} km`
                   : '計算中...'}
               </div>
             </div>

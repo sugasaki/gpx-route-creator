@@ -2,8 +2,8 @@ import { create } from 'zustand'
 import { RoutePoint, Route, Waypoint } from '@/types'
 import { calculateDistance, calculateDistanceToWaypoint, calculateAllWaypointDistances } from '@/utils/geo'
 import { RouteHistoryManager, type HistoryState } from '@/domain/RouteHistoryManager'
-import { generateId } from '@/domain/id-generator'
 import { createWaypoint } from '@/domain/waypoint-factory'
+import { generateId } from '@/domain/id-generator'
 
 interface RouteState {
   route: Route

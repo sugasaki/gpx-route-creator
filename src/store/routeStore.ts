@@ -2,6 +2,8 @@ import { create } from 'zustand'
 import { RoutePoint, Route, Waypoint } from '@/types'
 import { calculateDistance, calculateDistanceToWaypoint, calculateAllWaypointDistances } from '@/utils/geo'
 import { RouteHistoryManager, type HistoryState } from '@/domain/RouteHistoryManager'
+import { createWaypoint } from '@/domain/waypoint-factory'
+import { generateId } from '@/domain/id-generator'
 
 interface RouteState {
   route: Route
@@ -27,7 +29,6 @@ interface RouteState {
   recalculateWaypointDistances: () => void
 }
 
-const generateId = () => Math.random().toString(36).substr(2, 9)
 
 export const useRouteStore = create<RouteState>((set, get) => {
   // ヘルパー関数：履歴を更新し、新しい状態を設定
@@ -169,14 +170,7 @@ export const useRouteStore = create<RouteState>((set, get) => {
   },
   
   addWaypoint: (waypoint) => {
-    const newWaypoint: Waypoint = { 
-      ...waypoint, 
-      id: generateId(),
-      distanceFromStart: calculateDistanceToWaypoint(
-        waypoint as Waypoint,
-        get().route.points
-      )
-    }
+    const newWaypoint = createWaypoint(waypoint, get().route.points)
     const newWaypoints = [...get().waypoints, newWaypoint]
     
     updateHistoryAndState(null, newWaypoints)

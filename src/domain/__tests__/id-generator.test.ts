@@ -26,16 +26,20 @@ describe('generateId', () => {
   
   it('should generate IDs with consistent format', () => {
     const id = generateId()
-    // 英数字のみで構成されている
-    expect(id).toMatch(/^[a-z0-9]+$/)
+    // UUIDフォーマット（ハイフン含む）または英数字のみ
+    const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)
+    const isSimpleId = /^[a-z0-9]+$/.test(id)
+    expect(isUUID || isSimpleId).toBe(true)
   })
   
   it('should generate IDs with reasonable length', () => {
     const ids = Array.from({ length: 100 }, () => generateId())
     
     ids.forEach(id => {
-      expect(id.length).toBeGreaterThanOrEqual(8)
-      expect(id.length).toBeLessThanOrEqual(12)
+      // UUIDは36文字、フォールバックは8-12文字
+      const isUUID = id.length === 36 && id.includes('-')
+      const isSimpleId = id.length >= 8 && id.length <= 12
+      expect(isUUID || isSimpleId).toBe(true)
     })
   })
 })

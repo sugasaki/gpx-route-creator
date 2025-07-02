@@ -1,10 +1,10 @@
 import { create } from 'zustand'
 import { RoutePoint, Route, Waypoint } from '@/types'
 import { RouteHistoryManager, type HistoryState } from '@/domain/RouteHistoryManager'
-import { createWaypoint } from '@/domain/waypoint-factory'
-import { generateId } from '@/domain/id-generator'
-import { RouteCalculator } from '@/domain/route-calculator'
+import { RouteManager } from '@/domain/RouteManager'
+import { WaypointManager } from '@/domain/WaypointManager'
 import { WaypointCalculator } from '@/domain/waypoint-calculator'
+import { RouteCalculator } from '@/domain/route-calculator'
 
 interface RouteState {
   route: Route
@@ -64,45 +64,35 @@ export const useRouteStore = create<RouteState>((set, get) => {
   historyIndex: 0,
   
   addPoint: (point) => {
-    const newPoint: RoutePoint = { ...point, id: generateId() }
-    const newPoints = [...get().route.points, newPoint]
-    const newRoute = RouteCalculator.createRoute(newPoints)
+    const newRoute = RouteManager.addPoint(get().route, point)
     
     updateHistoryAndState(newRoute, null)
     get().recalculateWaypointDistances()
   },
   
   insertPoint: (index, point) => {
-    const newPoint: RoutePoint = { ...point, id: generateId() }
-    const newPoints = [...get().route.points]
-    newPoints.splice(index, 0, newPoint)
-    const newRoute = RouteCalculator.createRoute(newPoints)
+    const newRoute = RouteManager.insertPoint(get().route, index, point)
     
     updateHistoryAndState(newRoute, null)
     get().recalculateWaypointDistances()
   },
   
   updatePoint: (id, updates) => {
-    const newPoints = get().route.points.map(p => 
-      p.id === id ? { ...p, ...updates } : p
-    )
-    const newRoute = RouteCalculator.createRoute(newPoints)
+    const newRoute = RouteManager.updatePoint(get().route, id, updates)
     
     updateHistoryAndState(newRoute, null)
     get().recalculateWaypointDistances()
   },
   
   deletePoint: (id) => {
-    const newPoints = get().route.points.filter(p => p.id !== id)
-    const newRoute = RouteCalculator.createRoute(newPoints)
+    const newRoute = RouteManager.deletePoint(get().route, id)
     
     updateHistoryAndState(newRoute, null)
     get().recalculateWaypointDistances()
   },
   
   deleteMultiplePoints: (ids) => {
-    const newPoints = get().route.points.filter(p => !ids.includes(p.id))
-    const newRoute = RouteCalculator.createRoute(newPoints)
+    const newRoute = RouteManager.deleteMultiplePoints(get().route, ids)
     
     updateHistoryAndState(newRoute, null)
     get().recalculateWaypointDistances()
@@ -113,10 +103,7 @@ export const useRouteStore = create<RouteState>((set, get) => {
   },
   
   movePointWithoutHistory: (id, lat, lng) => {
-    const newPoints = get().route.points.map(p => 
-      p.id === id ? { ...p, lat, lng } : p
-    )
-    const newRoute = RouteCalculator.createRoute(newPoints)
+    const newRoute = RouteManager.movePoint(get().route, id, lat, lng)
     
     set({ route: newRoute })
     get().recalculateWaypointDistances()
@@ -169,48 +156,39 @@ export const useRouteStore = create<RouteState>((set, get) => {
   },
   
   addWaypoint: (waypoint) => {
-    const newWaypoint = createWaypoint(waypoint, get().route.points)
-    const newWaypoints = [...get().waypoints, newWaypoint]
+    const newWaypoints = WaypointManager.addWaypoint(
+      get().waypoints,
+      waypoint,
+      get().route.points
+    )
     
     updateHistoryAndState(null, newWaypoints)
   },
   
   updateWaypoint: (id, updates) => {
-    const updatedWaypoints = get().waypoints.map(w => {
-      if (w.id === id) {
-        const updatedWaypoint = { ...w, ...updates }
-        // nearestPointIndexが更新された場合、距離を再計算
-        if (updates.nearestPointIndex !== undefined || updates.lat !== undefined || updates.lng !== undefined) {
-          updatedWaypoint.distanceFromStart = WaypointCalculator.calculateDistanceToWaypoint(
-            updatedWaypoint,
-            get().route.points
-          )
-        }
-        return updatedWaypoint
-      }
-      return w
-    })
+    const updatedWaypoints = WaypointManager.updateWaypoint(
+      get().waypoints,
+      id,
+      updates,
+      get().route.points
+    )
     
     updateHistoryAndState(null, updatedWaypoints)
   },
   
   deleteWaypoint: (id) => {
-    const newWaypoints = get().waypoints.filter(w => w.id !== id)
+    const newWaypoints = WaypointManager.deleteWaypoint(get().waypoints, id)
     
     updateHistoryAndState(null, newWaypoints)
   },
   
   moveWaypointOnRoute: (id, nearestPointIndex) => {
-    const updatedWaypoints = get().waypoints.map(w => {
-      if (w.id === id) {
-        const updatedWaypoint = { ...w, nearestPointIndex }
-        return WaypointCalculator.updateWaypointDistance(
-          updatedWaypoint,
-          get().route.points
-        )
-      }
-      return w
-    })
+    const updatedWaypoints = WaypointManager.moveWaypointOnRoute(
+      get().waypoints,
+      id,
+      nearestPointIndex,
+      get().route.points
+    )
     
     updateHistoryAndState(null, updatedWaypoints)
   },

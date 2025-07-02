@@ -39,4 +39,32 @@ export class RouteHistoryManager {
       newIndex: newHistory.length - 1
     }
   }
+  
+  static undo(
+    history: HistoryState[],
+    currentIndex: number
+  ): { state: HistoryState, newIndex: number } | null {
+    if (!this.canUndo(currentIndex)) {
+      return null
+    }
+    
+    return {
+      state: history[currentIndex - 1],
+      newIndex: currentIndex - 1
+    }
+  }
+  
+  static redo(
+    history: HistoryState[],
+    currentIndex: number
+  ): { state: HistoryState, newIndex: number } | null {
+    if (!this.canRedo(currentIndex, history.length)) {
+      return null
+    }
+    
+    return {
+      state: history[currentIndex + 1],
+      newIndex: currentIndex + 1
+    }
+  }
 }

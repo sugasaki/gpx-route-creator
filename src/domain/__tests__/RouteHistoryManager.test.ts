@@ -100,4 +100,61 @@ describe('RouteHistoryManager', () => {
       expect(result.newIndex).toBe(2)
     })
   })
+  
+  describe('undo', () => {
+    it('should return previous state when undo is possible', () => {
+      const history = [
+        { route: mockRoute, waypoints: [] },
+        { route: mockRoute, waypoints: mockWaypoints },
+        { route: mockRoute, waypoints: [...mockWaypoints, ...mockWaypoints] }
+      ]
+      const currentIndex = 2
+      
+      const result = RouteHistoryManager.undo(history, currentIndex)
+      
+      expect(result).not.toBeNull()
+      expect(result?.state).toEqual(history[1])
+      expect(result?.newIndex).toBe(1)
+    })
+    
+    it('should return null when undo is not possible', () => {
+      const history = [
+        { route: mockRoute, waypoints: [] }
+      ]
+      const currentIndex = 0
+      
+      const result = RouteHistoryManager.undo(history, currentIndex)
+      
+      expect(result).toBeNull()
+    })
+  })
+  
+  describe('redo', () => {
+    it('should return next state when redo is possible', () => {
+      const history = [
+        { route: mockRoute, waypoints: [] },
+        { route: mockRoute, waypoints: mockWaypoints },
+        { route: mockRoute, waypoints: [...mockWaypoints, ...mockWaypoints] }
+      ]
+      const currentIndex = 1
+      
+      const result = RouteHistoryManager.redo(history, currentIndex)
+      
+      expect(result).not.toBeNull()
+      expect(result?.state).toEqual(history[2])
+      expect(result?.newIndex).toBe(2)
+    })
+    
+    it('should return null when redo is not possible', () => {
+      const history = [
+        { route: mockRoute, waypoints: [] },
+        { route: mockRoute, waypoints: mockWaypoints }
+      ]
+      const currentIndex = 1
+      
+      const result = RouteHistoryManager.redo(history, currentIndex)
+      
+      expect(result).toBeNull()
+    })
+  })
 })

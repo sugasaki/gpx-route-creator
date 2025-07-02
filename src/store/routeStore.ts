@@ -114,26 +114,24 @@ export const useRouteStore = create<RouteState>((set, get) => {
   },
   
   undo: () => {
-    const { historyIndex, history } = get()
-    if (historyIndex > 0) {
-      const previousState = history[historyIndex - 1]
+    const result = RouteHistoryManager.undo(get().history, get().historyIndex)
+    if (result) {
       set({
-        route: previousState.route,
-        waypoints: previousState.waypoints,
-        historyIndex: historyIndex - 1
+        route: result.state.route,
+        waypoints: result.state.waypoints,
+        historyIndex: result.newIndex
       })
       get().recalculateWaypointDistances()
     }
   },
   
   redo: () => {
-    const { historyIndex, history } = get()
-    if (historyIndex < history.length - 1) {
-      const nextState = history[historyIndex + 1]
+    const result = RouteHistoryManager.redo(get().history, get().historyIndex)
+    if (result) {
       set({
-        route: nextState.route,
-        waypoints: nextState.waypoints,
-        historyIndex: historyIndex + 1
+        route: result.state.route,
+        waypoints: result.state.waypoints,
+        historyIndex: result.newIndex
       })
       get().recalculateWaypointDistances()
     }

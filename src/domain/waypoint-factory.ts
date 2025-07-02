@@ -12,14 +12,12 @@ export const createWaypoint = (
   waypoint: Omit<Waypoint, 'id' | 'distanceFromStart'>,
   routePoints: RoutePoint[]
 ): Waypoint => {
+  const id = generateId()
   const newWaypoint: Waypoint = {
     ...waypoint,
-    id: generateId(),
-    distanceFromStart: 0 // 一時的な値
+    id,
+    distanceFromStart: calculateDistanceToWaypoint({ ...waypoint, id } as Waypoint, routePoints)
   }
-  
-  // 距離を計算して設定
-  newWaypoint.distanceFromStart = calculateDistanceToWaypoint(newWaypoint, routePoints)
   
   return newWaypoint
 }

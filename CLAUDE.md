@@ -37,6 +37,11 @@
 
 `doc/architecture.md`を参照してください
 
+### Hexagonal Architecture（ポートとアダプター）
+- **ドメイン層の独立性**: ビジネスロジックはUIフレームワークや状態管理ライブラリに依存しない
+- **ドメインクラス**: `src/domain/`ディレクトリに配置し、純粋なTypeScriptクラスとして実装
+- **Storeは薄いラッパー**: Zustand storeはドメインクラスを呼び出すだけの薄いアダプター
+- **テスタビリティ**: 各ドメインクラスは独立してユニットテスト可能
 
 ## State Management
 - **Zustand優先**: プロジェクト共通のstateはZustandで管理する
@@ -44,6 +49,7 @@
 - **Store設計**: 
   - `src/store/`ディレクトリに機能別にstoreを配置
   - 単一責任の原則に従い、各storeは特定のドメインのみを管理
+  - **ビジネスロジックの分離**: storeにビジネスロジックを書かず、ドメイン層に委譲
 - **Local State**: コンポーネント固有の一時的な状態のみuseStateを使用
 - **Global State**: 複数のコンポーネントで共有される状態はZustandへ
 - **Selector Pattern**: 必要なstateのみを選択的に取得し、不要な再レンダリングを防ぐ
@@ -72,6 +78,39 @@
 
 `doc/refactoring-guideline.md`を参照してください
 
+## ドメインロジックの抽出
+新しいビジネスロジックを実装する際は：
+1. まずドメインクラスのテストを書く（TDD）
+2. テストが失敗することを確認
+3. ドメインクラスを実装してテストを通す
+4. storeから該当ロジックを呼び出す
+
+### 例：新しい操作を追加する場合
+```typescript
+// 1. テストファースト
+// src/domain/__tests__/YourManager.test.ts
+
+// 2. ドメインクラス実装
+// src/domain/YourManager.ts
+export class YourManager {
+  static yourOperation(/* params */) {
+    // ビジネスロジック
+  }
+}
+
+// 3. storeから呼び出し
+// src/store/yourStore.ts
+yourAction: (params) => {
+  const result = YourManager.yourOperation(params)
+  set(result)
+}
+```
+
 # テストの書き方
 
 `doc/test-guideline.md`を参照してください
+
+## ドメイン層のテスト
+- 各ドメインクラスは独立してテスト
+- 外部依存なしの純粋な単体テスト
+- カバレッジ100%を目指す

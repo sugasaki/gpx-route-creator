@@ -63,6 +63,7 @@ MapLibreとReactを使用したWebベースのGPXルート作成アプリケー�
 - **スタイリング**: Tailwind CSS
 - **ビルドツール**: Vite
 - **アイコン**: Heroicons
+- **テスト**: Vitest + React Testing Library
 
 ### 特徴
 
@@ -72,6 +73,7 @@ MapLibreとReactを使用したWebベースのGPXルート作成アプリケー�
 - 🎯 **単一責任の原則**: 各モジュールが明確な役割を持つ設計
 - 🔒 **型安全**: TypeScriptによる厳密な型定義
 - 🚀 **高速ビルド**: Viteによる高速な開発体験
+- 🏛️ **Hexagonal Architecture**: ビジネスロジックとUIの完全な分離
 
 ## セットアップ
 
@@ -174,17 +176,35 @@ src/
 ├── utils/               # ユーティリティ関数
 ├── constants/           # 定数定義
 ├── store/               # 状態管理（Zustand）
+├── domain/              # ビジネスロジック（ドメイン層）
+│   ├── RouteManager.ts  # ルート操作ロジック
+│   ├── WaypointManager.ts # Waypoint操作ロジック
+│   ├── RouteHistoryManager.ts # 履歴管理（undo/redo）
+│   └── ...              # その他のドメインロジック
 └── types/               # 型定義
 ```
 
 ### アーキテクチャ
 
-このプロジェクトは、保守性と拡張性を重視した設計になっています：
+このプロジェクトは、**Hexagonal Architecture（ポートとアダプター）**パターンを採用し、ビジネスロジックとUIを完全に分離しています：
 
-- **コンポーネント**: UIの表示に専念（ロジックは最小限）
-- **カスタムフック**: 複雑なロジックをカプセル化
-- **ユーティリティ**: 純粋関数で再利用可能な処理
-- **状態管理**: Zustandで集中管理
+#### ドメイン層（ビジネスロジック）
+- **RouteManager**: ルートポイントの追加、削除、更新などの操作
+- **WaypointManager**: Waypointの管理と距離計算
+- **RouteHistoryManager**: undo/redoなどの履歴管理
+- **RouteCalculator/WaypointCalculator**: 距離計算ロジック
+- **StateManager/HistoryManager**: 状態管理のユーティリティ
+
+#### アダプター層
+- **Store（Zustand）**: ドメインロジックへの薄いラッパー
+- **コンポーネント**: UIの表示とユーザーインタラクション
+- **カスタムフック**: コンポーネントとストアの橋渡し
+
+この設計により：
+- ✅ ビジネスロジックがUIフレームワークに依存しない
+- ✅ 状態管理ライブラリ（Zustand）の変更が容易
+- ✅ 各ドメインクラスが独立してテスト可能
+- ✅ 高い保守性と拡張性
 
 詳細なアーキテクチャ設計については [doc/architecture.md](doc/architecture.md) を参照してください。
 

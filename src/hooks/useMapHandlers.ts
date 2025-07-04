@@ -78,17 +78,17 @@ export function useMapHandlers({ mapRef }: UseMapHandlersProps) {
       mapRef.current.getCanvas().style.cursor = waypointCursor
     }
     
-    // 中間点のホバー処理
-    if (route.points.length <= 2) return
+    // ポイントのホバー処理
+    if (route.points.length === 0) return
     
     const { point } = e
     const threshold: number = MAP_CONSTANTS.HOVER_THRESHOLD_PIXELS
     
-    // Check distance to middle points only
+    // Check distance to all points
     let closestPoint = null
     let minDistance = threshold
     
-    for (let i = 1; i < route.points.length - 1; i++) {
+    for (let i = 0; i < route.points.length; i++) {
       const routePoint = route.points[i]
       const pixel = mapRef.current.project([routePoint.lng, routePoint.lat])
       const distance = Math.sqrt(
@@ -104,11 +104,7 @@ export function useMapHandlers({ mapRef }: UseMapHandlersProps) {
     if (closestPoint) {
       setHoveredPoint(closestPoint.id)
     } else if (hoveredPointId) {
-      // Check if currently hovered point is a middle point
-      const hoveredIndex = route.points.findIndex(p => p.id === hoveredPointId)
-      if (hoveredIndex > 0 && hoveredIndex < route.points.length - 1) {
-        setHoveredPoint(null)
-      }
+      setHoveredPoint(null)
     }
   }, [route.points, hoveredPointId, setHoveredPoint, getCursorForWaypointMode, mapRef])
   

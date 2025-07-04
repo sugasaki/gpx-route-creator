@@ -39,7 +39,8 @@ export function useMapHandlers({ mapRef }: UseMapHandlersProps) {
       return
     }
     
-    if (editMode !== 'create') return
+    // Allow line clicks in both create and edit modes
+    if (editMode !== 'create' && editMode !== 'edit') return
     
     // Check if we clicked on the line
     const features = mapRef.current?.queryRenderedFeatures(e.point, {
@@ -59,8 +60,8 @@ export function useMapHandlers({ mapRef }: UseMapHandlersProps) {
         lat: clickPoint.lat,
         lng: clickPoint.lng
       })
-    } else {
-      // Clicked on empty space - add to end
+    } else if (editMode === 'create') {
+      // Clicked on empty space - add to end (only in create mode)
       addPoint({
         lat: e.lngLat.lat,
         lng: e.lngLat.lng
@@ -112,7 +113,7 @@ export function useMapHandlers({ mapRef }: UseMapHandlersProps) {
   }, [route.points, hoveredPointId, setHoveredPoint, getCursorForWaypointMode, mapRef])
   
   const handleMouseEnter = useCallback((e: any) => {
-    if (editMode === 'create' && e.features && e.features.length > 0 && e.features[0].layer.id === 'route-line') {
+    if ((editMode === 'create' || editMode === 'edit') && e.features && e.features.length > 0 && e.features[0].layer.id === 'route-line') {
       e.target.getCanvas().style.cursor = 'pointer'
     } else if (editMode === 'waypoint' && e.features && e.features.length > 0 && e.features[0].layer.id === 'route-line') {
       e.target.getCanvas().style.cursor = 'pointer'

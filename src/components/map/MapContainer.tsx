@@ -18,7 +18,7 @@ const MapContainer = forwardRef<MapRef, MapContainerProps>(
     const { route } = useRouteStore()
     const { editMode, mapStyle } = useUIStore()
     
-    const shouldShowInteractiveLine = editMode === 'create' && route.points.length > 1
+    const shouldShowInteractiveLine = (editMode === 'create' || editMode === 'edit' || editMode === 'waypoint') && route.points.length > 1
     const selectedStyle = MAP_STYLES[mapStyle]
     
     // Fallback to dark style if selected style has no URL (missing API key)

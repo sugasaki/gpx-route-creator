@@ -129,20 +129,13 @@ export function calculateDistanceToWaypoint(
     return 0
   }
 
-  // Find the exact position of the waypoint on the route
+  // Waypointの座標
   const waypointPoint = turf.point([waypoint.lng, waypoint.lat])
-  const routeLine = turf.lineString(
-    routePoints.map(p => [p.lng, p.lat])
-  )
   
-  // Get the snapped point on the line (exact position on route)
-  const snappedPoint = turf.pointOnLine(routeLine, waypointPoint)
-  
-  // Calculate distance along the route to this point
-  // We need to build the route up to the waypoint's position
+  // 累積距離を計算
   let accumulatedDistance = 0
   
-  // Add distances for complete segments before the waypoint
+  // nearestPointIndexまでの完全なセグメントの距離を加算
   for (let i = 0; i < waypoint.nearestPointIndex; i++) {
     const segmentLine = turf.lineString([
       [routePoints[i].lng, routePoints[i].lat],
@@ -151,8 +144,17 @@ export function calculateDistanceToWaypoint(
     accumulatedDistance += turf.lineDistance(segmentLine, 'kilometers')
   }
   
-  // Add partial distance on the segment containing the waypoint
+  // nearestPointIndexのセグメント上でWaypointに最も近い点を見つける
   if (waypoint.nearestPointIndex < routePoints.length - 1) {
+    const segment = turf.lineString([
+      [routePoints[waypoint.nearestPointIndex].lng, routePoints[waypoint.nearestPointIndex].lat],
+      [routePoints[waypoint.nearestPointIndex + 1].lng, routePoints[waypoint.nearestPointIndex + 1].lat]
+    ])
+    
+    // このセグメント上の最近点を求める
+    const snappedPoint = turf.pointOnLine(segment, waypointPoint)
+    
+    // セグメントの始点から最近点までの距離を加算
     const segmentStart = turf.point([
       routePoints[waypoint.nearestPointIndex].lng,
       routePoints[waypoint.nearestPointIndex].lat

@@ -82,11 +82,12 @@ describe('GPXImport', () => {
       expect(gpxImportUtils.applyGPXData).toHaveBeenCalledWith(
         mockRoutePoints,
         mockWaypoints,
-        {
+        expect.objectContaining({
           clearRoute: mockClearRoute,
           addPoint: mockAddPoint,
-          addWaypoint: mockAddWaypoint
-        }
+          addWaypoint: mockAddWaypoint,
+          getRoutePoints: expect.any(Function)
+        })
       )
     })
   })

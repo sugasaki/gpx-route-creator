@@ -87,8 +87,15 @@ describe('gpxImport', () => {
       const mockActions = {
         clearRoute: vi.fn(),
         addPoint: vi.fn(),
-        addWaypoint: vi.fn()
+        addWaypoint: vi.fn(),
+        getRoutePoints: vi.fn()
       }
+      
+      // ルートポイントが追加された後の状態を返すようにモック
+      mockActions.getRoutePoints.mockReturnValue([
+        { id: '1', lat: 35.6812, lng: 139.7671, elevation: 10 },
+        { id: '2', lat: 35.6813, lng: 139.7672, elevation: 11 }
+      ])
       
       const routePoints = [
         { lat: 35.6812, lng: 139.7671, elevation: 10 },
@@ -121,15 +128,71 @@ describe('gpxImport', () => {
       
       // 各ウェイポイントが追加されることを確認
       expect(mockActions.addWaypoint).toHaveBeenCalledTimes(2)
-      expect(mockActions.addWaypoint).toHaveBeenNthCalledWith(1, waypoints[0])
-      expect(mockActions.addWaypoint).toHaveBeenNthCalledWith(2, waypoints[1])
+    })
+    
+    it('should calculate waypoint distances when applying GPX data', () => {
+      const mockActions = {
+        clearRoute: vi.fn(),
+        addPoint: vi.fn(),
+        addWaypoint: vi.fn(),
+        getRoutePoints: vi.fn()
+      }
+      
+      const routePoints = [
+        { lat: 35.6812, lng: 139.7671, elevation: 10 },
+        { lat: 35.6813, lng: 139.7672, elevation: 11 }
+      ]
+      
+      const waypoints = [
+        { lat: 35.6814, lng: 139.7673, name: 'Waypoint 1', type: 'pin' as const },
+        { lat: 35.6815, lng: 139.7674, name: 'Waypoint 2', type: 'food' as const }
+      ]
+      
+      // ルートポイントが追加された後の状態を返すようにモック
+      mockActions.getRoutePoints.mockReturnValue([
+        { id: '1', lat: 35.6812, lng: 139.7671, elevation: 10 },
+        { id: '2', lat: 35.6813, lng: 139.7672, elevation: 11 }
+      ])
+      
+      applyGPXData(routePoints, waypoints, mockActions)
+      
+      // WaypointがnearestPointIndexとdistanceFromStartを含んで追加されることを確認
+      expect(mockActions.addWaypoint).toHaveBeenCalledTimes(2)
+      
+      // 第1引数に渡されたWaypointオブジェクトを確認
+      const firstWaypointCall = mockActions.addWaypoint.mock.calls[0][0]
+      const secondWaypointCall = mockActions.addWaypoint.mock.calls[1][0]
+      
+      // nearestPointIndexとdistanceFromStartが計算されていることを確認
+      expect(firstWaypointCall).toMatchObject({
+        lat: 35.6814,
+        lng: 139.7673,
+        name: 'Waypoint 1',
+        type: 'pin',
+        nearestPointIndex: expect.any(Number),
+        distanceFromStart: expect.any(Number)
+      })
+      
+      expect(secondWaypointCall).toMatchObject({
+        lat: 35.6815,
+        lng: 139.7674,
+        name: 'Waypoint 2',
+        type: 'food',
+        nearestPointIndex: expect.any(Number),
+        distanceFromStart: expect.any(Number)
+      })
+      
+      // distanceFromStartが0でないことを確認
+      expect(firstWaypointCall.distanceFromStart).toBeGreaterThan(0)
+      expect(secondWaypointCall.distanceFromStart).toBeGreaterThan(0)
     })
     
     it('should handle empty data', () => {
       const mockActions = {
         clearRoute: vi.fn(),
         addPoint: vi.fn(),
-        addWaypoint: vi.fn()
+        addWaypoint: vi.fn(),
+        getRoutePoints: vi.fn().mockReturnValue([])
       }
       
       applyGPXData([], [], mockActions)

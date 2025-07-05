@@ -41,8 +41,8 @@ describe('StateManager', () => {
       expect(initialState).toEqual({
         route: { points: [], distance: 0 },
         waypoints: [],
-        history: [{ route: { points: [], distance: 0 }, waypoints: [] }],
-        historyIndex: 0
+        history: [],
+        historyIndex: -1
       })
     })
   })
@@ -72,8 +72,8 @@ describe('StateManager', () => {
       expect(update).toEqual({
         route: { points: [], distance: 0 },
         waypoints: [],
-        history: [{ route: { points: [], distance: 0 }, waypoints: [] }],
-        historyIndex: 0
+        history: [],
+        historyIndex: -1
       })
     })
   })

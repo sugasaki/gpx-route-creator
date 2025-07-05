@@ -37,6 +37,7 @@ export interface GPXImportActions {
   clearRoute: () => void
   addPoint: (point: Omit<RoutePoint, 'id'>) => void
   addWaypoint: (waypoint: Omit<Waypoint, 'id'>) => void
+  getRoutePoints: () => RoutePoint[]
 }
 
 export function applyGPXData(

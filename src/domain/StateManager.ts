@@ -29,8 +29,8 @@ export class StateManager {
     const emptyState = this.createEmptyState()
     return {
       ...emptyState,
-      history: [emptyState],
-      historyIndex: 0
+      history: [],
+      historyIndex: -1
     }
   }
   

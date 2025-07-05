@@ -8,6 +8,7 @@ import ModeIndicator from '@/components/controls/ModeIndicator'
 import MapStyleSelector from '@/components/controls/MapStyleSelector'
 import RouteColorPicker from '@/components/controls/RouteColorPicker'
 import DistanceMarkerToggle from '@/components/controls/DistanceMarkerToggle'
+import GPXImport from '@/components/controls/GPXImport'
 
 export default function MapControls() {
   return (
@@ -33,6 +34,7 @@ export default function MapControls() {
         
         <div className="h-px bg-gray-300 my-1" />
         
+        <GPXImport />
         <RouteActions />
       </div>
       

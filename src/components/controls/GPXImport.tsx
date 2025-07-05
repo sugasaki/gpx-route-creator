@@ -14,6 +14,7 @@ export default function GPXImport() {
   const [error, setError] = useState<string | null>(null)
   
   const { route, clearRoute, addPoint, addWaypoint } = useRouteStore()
+  const store = useRouteStore()
   
   const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -46,7 +47,8 @@ export default function GPXImport() {
       applyGPXData(routePoints, waypoints, {
         clearRoute,
         addPoint,
-        addWaypoint
+        addWaypoint,
+        getRoutePoints: () => store.route.points
       })
       
     } catch (err) {

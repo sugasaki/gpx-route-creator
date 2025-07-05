@@ -1,5 +1,6 @@
 import { RoutePoint, Waypoint } from '@/types'
 import { parseGPX, readFileAsText } from './gpxParser'
+import { findClosestPointOnRoute } from './geo'
 
 /**
  * GPXファイルの検証
@@ -57,8 +58,23 @@ export function applyGPXData(
     })
   })
   
-  // ウェイポイントを追加
+  // ルートポイントを取得して、Waypoint追加時に使用
+  const currentRoutePoints = actions.getRoutePoints()
+  
+  // ウェイポイントを追加（nearestPointIndexとdistanceFromStartを計算）
   waypoints.forEach(waypoint => {
-    actions.addWaypoint(waypoint)
+    // 最も近いルート上の点を見つける
+    const closestPoint = findClosestPointOnRoute(
+      waypoint.lat,
+      waypoint.lng,
+      currentRoutePoints
+    )
+    
+    // nearestPointIndexとdistanceFromStartを含めて追加
+    actions.addWaypoint({
+      ...waypoint,
+      nearestPointIndex: closestPoint.nearestPointIndex,
+      distanceFromStart: 0 // これはaddWaypoint内で計算される
+    })
   })
 }

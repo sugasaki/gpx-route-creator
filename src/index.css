@@ -20,3 +20,44 @@ body {
 .map-cursor-crosshair canvas {
   cursor: crosshair !important;
 }
+
+/* Mobile-specific optimizations */
+html, body {
+  overflow: hidden;
+  touch-action: none;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Allow touch actions only on the map */
+.maplibregl-map {
+  touch-action: pan-x pan-y;
+}
+
+/* Prevent pull-to-refresh on mobile */
+body {
+  overscroll-behavior-y: none;
+}
+
+/* Ensure full height on mobile browsers */
+#root {
+  height: 100vh;
+  height: 100dvh; /* Dynamic viewport height for mobile browsers */
+}
+
+/* Prevent text selection on buttons */
+button {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Improve touch target size for mobile */
+@media (hover: none) and (pointer: coarse) {
+  button {
+    min-width: 48px;
+    min-height: 48px;
+  }
+}

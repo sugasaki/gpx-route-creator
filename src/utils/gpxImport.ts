@@ -50,25 +50,31 @@ export function applyGPXData(
   // ルートをクリア
   actions.clearRoute()
   
-  // ルートポイントを追加
-  routePoints.forEach(point => {
+  // ルートポイントを追加し、追加されたポイントを追跡
+  // IDが付与されていないため、元のroutePointsデータを使用する
+  const addedRoutePoints: RoutePoint[] = []
+  routePoints.forEach((point, index) => {
     actions.addPoint({
+      lat: point.lat,
+      lng: point.lng,
+      elevation: point.elevation
+    })
+    // 追加されたポイントをシミュレート（実際のIDは不明だが、順序は保証される）
+    addedRoutePoints.push({
+      id: `temp-${index}`,
       lat: point.lat,
       lng: point.lng,
       elevation: point.elevation
     })
   })
   
-  // ルートポイントを取得して、Waypoint追加時に使用
-  const currentRoutePoints = actions.getRoutePoints()
-  
-  // ウェイポイントを追加（nearestPointIndexとdistanceFromStartを計算）
-  waypoints.forEach(waypoint => {
+  // 追加したルートポイントを使用してWaypoint計算を行う
+  waypoints.forEach((waypoint) => {
     // 最も近いセグメントのインデックスを見つける
     const nearestPointIndex = findNearestSegmentIndex(
       waypoint.lat,
       waypoint.lng,
-      currentRoutePoints
+      addedRoutePoints
     )
     
     // 距離を計算
@@ -78,7 +84,7 @@ export function applyGPXData(
     }
     const distanceFromStart = calculateDistanceToWaypoint(
       waypointWithIndex as Waypoint,
-      currentRoutePoints
+      addedRoutePoints
     )
     
     // nearestPointIndexとdistanceFromStartを含めて追加

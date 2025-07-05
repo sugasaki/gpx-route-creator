@@ -92,10 +92,10 @@ export default function GPXImport() {
         onClick={handleClick}
         disabled={isLoading}
         className={`
-          p-2 rounded-lg shadow-lg transition-all
+          p-3 bg-white rounded-lg shadow-lg transition-all
           ${isLoading 
             ? 'bg-gray-400 cursor-not-allowed' 
-            : 'bg-white hover:bg-gray-50 active:scale-95'
+            : 'hover:bg-gray-100'
           }
         `}
         title="Import GPX file"

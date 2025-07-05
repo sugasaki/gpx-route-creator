@@ -1,7 +1,12 @@
 import { useRef, useState } from 'react'
 import { DocumentArrowUpIcon } from '@heroicons/react/24/outline'
 import { useRouteStore } from '@/store/routeStore'
-import { parseGPX, readFileAsText } from '@/utils/gpxParser'
+import { 
+  isValidGPXFile, 
+  processGPXFile, 
+  confirmRouteReplacement, 
+  applyGPXData 
+} from '@/utils/gpxImport'
 
 export default function GPXImport() {
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -15,7 +20,7 @@ export default function GPXImport() {
     if (!file) return
     
     // GPXファイルかチェック
-    if (!file.name.toLowerCase().endsWith('.gpx')) {
+    if (!isValidGPXFile(file)) {
       setError('Please select a GPX file')
       return
     }
@@ -24,11 +29,8 @@ export default function GPXImport() {
     setError(null)
     
     try {
-      // ファイルを読み込む
-      const content = await readFileAsText(file)
-      
-      // GPXをパース
-      const { routePoints, waypoints } = parseGPX(content)
+      // GPXファイルを処理
+      const { routePoints, waypoints } = await processGPXFile(file)
       
       if (routePoints.length === 0) {
         setError('No route points found in GPX file')
@@ -36,30 +38,15 @@ export default function GPXImport() {
       }
       
       // 既存のルートがある場合は確認
-      if (route.points.length > 0) {
-        const confirmed = window.confirm(
-          'This will replace the existing route. Do you want to continue?'
-        )
-        if (!confirmed) {
-          return
-        }
+      if (!confirmRouteReplacement(route.points.length > 0)) {
+        return
       }
       
-      // ルートをクリア
-      clearRoute()
-      
-      // ルートポイントを追加
-      routePoints.forEach(point => {
-        addPoint({
-          lat: point.lat,
-          lng: point.lng,
-          elevation: point.elevation
-        })
-      })
-      
-      // ウェイポイントを追加
-      waypoints.forEach(waypoint => {
-        addWaypoint(waypoint)
+      // GPXデータを適用
+      applyGPXData(routePoints, waypoints, {
+        clearRoute,
+        addPoint,
+        addWaypoint
       })
       
     } catch (err) {

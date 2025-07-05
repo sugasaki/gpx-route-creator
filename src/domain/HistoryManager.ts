@@ -30,6 +30,29 @@ export class HistoryManager {
     const currentRoute = newRoute || currentState.route
     const currentWaypoints = newWaypoints || currentState.waypoints
     
+    // 履歴が空の場合、現在の状態を最初の履歴として追加
+    if (currentState.history.length === 0) {
+      const currentSnapshot = RouteHistoryManager.createSnapshot(
+        currentState.route,
+        currentState.waypoints
+      )
+      const historyResult = RouteHistoryManager.addToHistory(
+        [currentSnapshot],
+        0,
+        RouteHistoryManager.createSnapshot(currentRoute, currentWaypoints)
+      )
+      
+      const updates: HistoryUpdate = {
+        history: historyResult.history,
+        historyIndex: historyResult.newIndex
+      }
+      
+      if (newRoute) updates.route = newRoute
+      if (newWaypoints) updates.waypoints = newWaypoints
+      
+      return updates
+    }
+    
     const historyResult = RouteHistoryManager.addToHistory(
       currentState.history,
       currentState.historyIndex,

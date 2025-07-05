@@ -102,11 +102,11 @@ export const useRouteStore = create<RouteState>((set, get) => {
   },
   
   undo: () => {
-    applyHistoryOperation(RouteHistoryManager.undo)
+    applyHistoryOperation((history, index) => RouteHistoryManager.undo(history, index))
   },
   
   redo: () => {
-    applyHistoryOperation(RouteHistoryManager.redo)
+    applyHistoryOperation((history, index) => RouteHistoryManager.redo(history, index))
   },
   
   clearRoute: () => {

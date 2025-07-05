@@ -36,15 +36,11 @@ export class HistoryManager {
         currentState.route,
         currentState.waypoints
       )
-      const historyResult = RouteHistoryManager.addToHistory(
-        [currentSnapshot],
-        0,
-        RouteHistoryManager.createSnapshot(currentRoute, currentWaypoints)
-      )
+      const newSnapshot = RouteHistoryManager.createSnapshot(currentRoute, currentWaypoints)
       
       const updates: HistoryUpdate = {
-        history: historyResult.history,
-        historyIndex: historyResult.newIndex
+        history: [currentSnapshot, newSnapshot],
+        historyIndex: 1
       }
       
       if (newRoute) updates.route = newRoute

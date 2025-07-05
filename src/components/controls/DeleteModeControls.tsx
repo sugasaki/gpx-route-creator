@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { useRouteStore } from '@/store/routeStore'
 import { useUIStore } from '@/store/uiStore'
 import { XCircleIcon } from '@heroicons/react/24/outline'
+import { getControlButtonClasses } from '@/utils/styles'
 
 export default function DeleteModeControls() {
   const { route } = useRouteStore()
@@ -24,14 +25,7 @@ export default function DeleteModeControls() {
     <button
       onClick={() => setEditMode(editMode === 'delete' ? 'view' : 'delete')}
       disabled={!hasRoute}
-      className={`
-        p-3 rounded-lg shadow-lg transition-all
-        ${editMode === 'delete'
-          ? 'bg-red-500 text-white hover:bg-red-600'
-          : 'bg-white text-gray-700 hover:bg-gray-100'
-        }
-        ${!hasRoute ? 'opacity-50 cursor-not-allowed' : ''}
-      `}
+      className={`${getControlButtonClasses(editMode === 'delete', 'red')} ${!hasRoute ? 'opacity-50 cursor-not-allowed' : ''}`}
       title="Delete points"
     >
       <XCircleIcon className="w-5 h-5" />

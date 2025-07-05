@@ -1,7 +1,9 @@
 import { Marker } from 'react-map-gl/maplibre'
 import { RoutePoint } from '@/types'
 import { useMarkerDrag } from '@/hooks/useMarkerDrag'
+import { useTouchMarkerDrag } from '@/hooks/useTouchMarkerDrag'
 import { getMarkerColor } from '@/utils/mapHelpers'
+import { isTouchDevice } from '@/utils/device'
 
 interface RouteMarkerProps {
   point: RoutePoint
@@ -12,12 +14,16 @@ interface RouteMarkerProps {
 }
 
 export default function RouteMarker({ point, isFirst, isLast, isVisible }: RouteMarkerProps) {
+  const regularDragHook = useMarkerDrag({ point, isFirst, isLast })
+  const touchDragHook = useTouchMarkerDrag({ point, isFirst, isLast })
+  
+  // Use touch hook for touch devices, regular hook for desktop
   const {
     isDragging,
     isSelected,
     canDrag,
     handlers
-  } = useMarkerDrag({ point, isFirst, isLast })
+  } = isTouchDevice() ? touchDragHook : regularDragHook
   
   const markerColor = getMarkerColor(isDragging, isSelected, isFirst, isLast)
   

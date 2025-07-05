@@ -5,6 +5,7 @@ import { useUIStore } from '@/store/uiStore'
 import { findClosestSegmentIndex } from '@/utils/geo'
 import { MAP_CONSTANTS } from '@/constants/map'
 import { useWaypointHandlers } from './useWaypointHandlers'
+import { useTouchHandlers } from './useTouchHandlers'
 
 interface UseMapHandlersProps {
   mapRef: RefObject<MapRef | null>
@@ -33,9 +34,22 @@ export function useMapHandlers({ mapRef }: UseMapHandlersProps) {
     }
   }, [editMode, mapRef])
   
-  const handleMapClick = useCallback((e: any) => {
+  const handlePointInteraction = useCallback((x: number, y: number) => {
+    if (!mapRef.current) return
+    
+    // Convert screen coordinates to map coordinates
+    const lngLat = mapRef.current.unproject([x, y])
+    const point = { x, y }
+    
+    // Create a synthetic event object for waypoint handler
+    const syntheticEvent = {
+      point,
+      lngLat,
+      originalEvent: { stopPropagation: () => {} }
+    }
+    
     // Waypointモードの処理を委譲
-    if (handleWaypointModeClick(e)) {
+    if (handleWaypointModeClick(syntheticEvent)) {
       return
     }
     
@@ -43,31 +57,34 @@ export function useMapHandlers({ mapRef }: UseMapHandlersProps) {
     if (editMode !== 'create' && editMode !== 'edit') return
     
     // Check if we clicked on the line
-    const features = mapRef.current?.queryRenderedFeatures(e.point, {
+    const features = mapRef.current?.queryRenderedFeatures([x, y], {
       layers: ['route-line']
     })
     
     if (features && features.length > 0) {
       // Clicked on the line - find the best insertion point
-      const clickPoint = e.lngLat
       const insertIndex = findClosestSegmentIndex(
-        clickPoint.lat, 
-        clickPoint.lng, 
+        lngLat.lat, 
+        lngLat.lng, 
         route.points
       )
       
       insertPoint(insertIndex, {
-        lat: clickPoint.lat,
-        lng: clickPoint.lng
+        lat: lngLat.lat,
+        lng: lngLat.lng
       })
     } else if (editMode === 'create') {
       // Clicked on empty space - add to end (only in create mode)
       addPoint({
-        lat: e.lngLat.lat,
-        lng: e.lngLat.lng
+        lat: lngLat.lat,
+        lng: lngLat.lng
       })
     }
   }, [editMode, addPoint, insertPoint, route.points, handleWaypointModeClick, mapRef])
+  
+  const handleMapClick = useCallback((e: any) => {
+    handlePointInteraction(e.point.x, e.point.y)
+  }, [handlePointInteraction])
   
   const handleMouseMove = useCallback((e: any) => {
     if (!mapRef.current) return
@@ -130,10 +147,21 @@ export function useMapHandlers({ mapRef }: UseMapHandlersProps) {
     }
   }, [editMode])
   
+  // Touch handlers for mobile support
+  const touchHandlers = useTouchHandlers({
+    mapRef,
+    onTap: handlePointInteraction,
+    onLongPress: (x, y) => {
+      // Long press can be used for context menu in the future
+      console.log('Long press at', x, y)
+    }
+  })
+  
   return {
     handleMapClick,
     handleMouseMove,
     handleMouseEnter,
-    handleMouseLeave
+    handleMouseLeave,
+    ...touchHandlers
   }
 }

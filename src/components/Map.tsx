@@ -2,13 +2,16 @@ import { useRef } from 'react'
 import { MapRef } from 'react-map-gl/maplibre'
 import { useMapHandlers } from '@/hooks/useMapHandlers'
 import MapControls from '@/components/MapControls'
+import MobileMapControls from '@/components/MobileMapControls'
 import MapContainer from '@/components/map/MapContainer'
 import RouteLine from '@/components/map/RouteLine'
 import RouteMarkers from '@/components/map/RouteMarkers'
 import WaypointMarkers from '@/components/map/WaypointMarkers'
 import DistanceMarkers from '@/components/map/DistanceMarkers'
 import SelectionOverlay from '@/components/SelectionOverlay'
+import TouchSelectionOverlay from '@/components/TouchSelectionOverlay'
 import WaypointDialog from '@/components/WaypointDialog'
+import { isTouchDevice } from '@/utils/device'
 
 export default function MapComponent() {
   const mapRef = useRef<MapRef>(null)
@@ -35,8 +38,12 @@ export default function MapComponent() {
         <WaypointMarkers />
       </MapContainer>
       
-      <SelectionOverlay mapRef={mapRef} />
-      <MapControls />
+      {isTouchDevice() ? (
+        <TouchSelectionOverlay mapRef={mapRef} />
+      ) : (
+        <SelectionOverlay mapRef={mapRef} />
+      )}
+      {isTouchDevice() ? <MobileMapControls /> : <MapControls />}
       <WaypointDialog />
     </div>
   )

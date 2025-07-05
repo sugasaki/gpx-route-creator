@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { useRouteStore } from '@/store/routeStore'
 import { useUIStore } from '@/store/uiStore'
 import { PlusIcon, PencilIcon, MapPinIcon } from '@heroicons/react/24/outline'
+import { getControlButtonClasses } from '@/utils/styles'
 
 export default function EditControls() {
   const { route } = useRouteStore()
@@ -30,13 +31,7 @@ export default function EditControls() {
             setEditMode('create')
           }
         }}
-        className={`
-          p-3 rounded-lg shadow-lg transition-all
-          ${editMode === 'create' 
-            ? 'bg-blue-500 text-white hover:bg-blue-600' 
-            : 'bg-white text-gray-700 hover:bg-gray-100'
-          }
-        `}
+        className={getControlButtonClasses(editMode === 'create', 'blue')}
         title="Create route"
       >
         <PlusIcon className="w-5 h-5" />
@@ -51,14 +46,7 @@ export default function EditControls() {
           }
         }}
         disabled={!hasRoute}
-        className={`
-          p-3 rounded-lg shadow-lg transition-all
-          ${editMode === 'edit'
-            ? 'bg-green-500 text-white hover:bg-green-600'
-            : 'bg-white text-gray-700 hover:bg-gray-100'
-          }
-          ${!hasRoute ? 'opacity-50 cursor-not-allowed' : ''}
-        `}
+        className={`${getControlButtonClasses(editMode === 'edit', 'green')} ${!hasRoute ? 'opacity-50 cursor-not-allowed' : ''}`}
         title="Edit route"
       >
         <PencilIcon className="w-5 h-5" />
@@ -73,14 +61,7 @@ export default function EditControls() {
           }
         }}
         disabled={!hasRoute}
-        className={`
-          p-3 rounded-lg shadow-lg transition-all
-          ${editMode === 'waypoint'
-            ? 'bg-purple-500 text-white hover:bg-purple-600'
-            : 'bg-white text-gray-700 hover:bg-gray-100'
-          }
-          ${!hasRoute ? 'opacity-50 cursor-not-allowed' : ''}
-        `}
+        className={`${getControlButtonClasses(editMode === 'waypoint', 'purple')} ${!hasRoute ? 'opacity-50 cursor-not-allowed' : ''}`}
         title="Add waypoints"
       >
         <MapPinIcon className="w-5 h-5" />

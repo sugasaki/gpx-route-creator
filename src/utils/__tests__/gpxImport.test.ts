@@ -181,6 +181,10 @@ describe('gpxImport', () => {
         nearestPointIndex: expect.any(Number),
         distanceFromStart: expect.any(Number)
       })
+      
+      // distanceFromStartが0でないことを確認
+      expect(firstWaypointCall.distanceFromStart).toBeGreaterThan(0)
+      expect(secondWaypointCall.distanceFromStart).toBeGreaterThan(0)
     })
     
     it('should handle empty data', () => {

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" version="1.1" creator="GPX Route Creator">
+  <metadata>
+    <name>Tokyo Imperial Palace Run</name>
+    <desc>A popular 5km running course around the Imperial Palace in Tokyo</desc>
+  </metadata>
+  
+  <wpt lat="35.6854" lon="139.7528">
+    <ele>15</ele>
+    <name>Start/Finish</name>
+    <desc>Sakurada-mon Gate</desc>
+    <type>pin</type>
+  </wpt>
+  
+  <wpt lat="35.6901" lon="139.7584">
+    <ele>18</ele>
+    <name>Otemachi Station</name>
+    <desc>Water fountain available</desc>
+    <type>rest</type>
+  </wpt>
+  
+  <wpt lat="35.6794" lon="139.7594">
+    <ele>12</ele>
+    <name>Nijubashi Bridge</name>
+    <desc>Beautiful view of the palace</desc>
+    <type>scenic</type>
+  </wpt>
+  
+  <trk>
+    <name>Imperial Palace Course</name>
+    <trkseg>
+      <trkpt lat="35.6854" lon="139.7528">
+        <ele>15</ele>
+      </trkpt>
+      <trkpt lat="35.6869" lon="139.7515">
+        <ele>16</ele>
+      </trkpt>
+      <trkpt lat="35.6889" lon="139.7522">
+        <ele>17</ele>
+      </trkpt>
+      <trkpt lat="35.6901" lon="139.7544">
+        <ele>17</ele>
+      </trkpt>
+      <trkpt lat="35.6901" lon="139.7584">
+        <ele>18</ele>
+      </trkpt>
+      <trkpt lat="35.6882" lon="139.7606">
+        <ele>16</ele>
+      </trkpt>
+      <trkpt lat="35.6854" lon="139.7615">
+        <ele>14</ele>
+      </trkpt>
+      <trkpt lat="35.6824" lon="139.7606">
+        <ele>13</ele>
+      </trkpt>
+      <trkpt lat="35.6794" lon="139.7594">
+        <ele>12</ele>
+      </trkpt>
+      <trkpt lat="35.6774" lon="139.7571">
+        <ele>13</ele>
+      </trkpt>
+      <trkpt lat="35.6774" lon="139.7541">
+        <ele>14</ele>
+      </trkpt>
+      <trkpt lat="35.6794" lon="139.7515">
+        <ele>14</ele>
+      </trkpt>
+      <trkpt lat="35.6824" lon="139.7506">
+        <ele>15</ele>
+      </trkpt>
+      <trkpt lat="35.6854" lon="139.7528">
+        <ele>15</ele>
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>
